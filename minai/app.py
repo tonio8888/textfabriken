@@ -7,7 +7,7 @@ from docx import Document
 st.set_page_config(page_title="TextFabriken AI", page_icon="🏭", layout="centered", initial_sidebar_state="expanded")
 
 # --- SPARA DIN GROQ-NYCKEL HÄR ---
-GROQ_API_KEY = "HÄR_KLISTRAR_DU_IN_DIN_GSK_NYCKEL"
+GROQ_API_KEY = "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"
 
 # --- INSTÄLLNINGAR & MINNE ---
 if "saved_sessions" not in st.session_state: st.session_state.saved_sessions = {}
