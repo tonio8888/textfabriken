@@ -134,7 +134,7 @@ def fraga_groq(system_prompt, user_prompt, forsok=5):
     return "Groq-servern är överbelastad just nu (Status 429). Försök igen om en liten stund."
 
 # --- BATCH-HANTERING FÖR STORA PRODUKTLISTOR ---
-RADER_PER_BATCH = 15  # Sänkt från 40 för att undvika avkapade svar
+RADER_PER_BATCH = 15  # Sänkt från 40 för att undvika avkapade svar och för stora anrop (413)
 
 def dela_upp_i_batchar(text, rader_per_batch=RADER_PER_BATCH):
     rader = [r for r in text.strip().split('\n') if r.strip() != ""]
@@ -145,6 +145,31 @@ def dela_upp_i_batchar(text, rader_per_batch=RADER_PER_BATCH):
             batchar.append(batch)
     return batchar if batchar else [text]
 
+def kor_massgenerering(extra_instruktion=""):
+    """Delar upp produktdatan i batchar och kör Groq-anrop med progressbar.
+       Används av både raketknappen och chattrutan för att undvika för stora anrop (413)."""
+    progress_bar = st.progress(0)
+    status_text = st.empty()
+
+    batchar = dela_upp_i_batchar(extratext)
+    alla_svar = []
+    for i, batch in enumerate(batchar):
+        status_text.markdown(f"*Bearbetar del {i + 1} av {len(batchar)} i TextFabrikens maskiner...*")
+        anvandarprompt = "Produktlista/Rådata:\n" + batch
+        if extra_instruktion:
+            anvandarprompt = "Användarens extra instruktion: " + extra_instruktion + "\n\n" + anvandarprompt
+        svar = fraga_groq(seo_direktiv, anvandarprompt)
+        alla_svar.append(svar)
+        progress_bar.progress((i + 1) / len(batchar))
+        if i < len(batchar) - 1:
+            time.sleep(2)  # Kort paus mellan batchar för att undvika rate limit
+
+    status_text.empty()
+    progress_bar.empty()
+
+    ai_svar = "\n\n---\n\n".join(alla_svar)
+    return ai_svar + "\n\n---\n⚠️ **Kontrollera alltid siffror och specifikationer** (t.ex. batteritid, mått, prestanda) mot din egen produktdata innan du publicerar texterna."
+
 # LOGIK FÖR RAKET-KNAPPEN
 if copy_klick:
     if not extratext:
@@ -154,26 +179,8 @@ if copy_klick:
         with st.chat_message("user", avatar="👤"): st.markdown(f"**Du:** {prompt_text}")
         st.session_state.messages.append({"role": "user", "content": prompt_text})
         with st.chat_message("assistant", avatar="🏭"):
-            message_placeholder = st.empty()
-            progress_bar = st.progress(0)
-            status_text = st.empty()
-
-            batchar = dela_upp_i_batchar(extratext)
-            alla_svar = []
-            for i, batch in enumerate(batchar):
-                status_text.markdown(f"*Bearbetar del {i + 1} av {len(batchar)} i TextFabrikens maskiner...*")
-                svar = fraga_groq(seo_direktiv, "Produktlista/Rådata:\n" + batch)
-                alla_svar.append(svar)
-                progress_bar.progress((i + 1) / len(batchar))
-                if i < len(batchar) - 1:
-                    time.sleep(2)  # Kort paus mellan batchar för att undvika rate limit
-
-            status_text.empty()
-            progress_bar.empty()
-
-            ai_svar = "\n\n---\n\n".join(alla_svar)
-            ai_svar_med_varning = ai_svar + "\n\n---\n⚠️ **Kontrollera alltid siffror och specifikationer** (t.ex. batteritid, mått, prestanda) mot din egen produktdata innan du publicerar texterna."
-            message_placeholder.markdown(f"**TextFabriken:**\n\n{ai_svar_med_varning}")
+            ai_svar_med_varning = kor_massgenerering()
+            st.markdown(f"**TextFabriken:**\n\n{ai_svar_med_varning}")
             st.session_state.messages.append({"role": "assistant", "content": ai_svar_med_varning})
             st.session_state.generated_file_content = ai_svar_med_varning
             st.session_state.show_download = True
@@ -189,29 +196,23 @@ if prompt:
     # Skicka bara med hela produktlistan om filen INTE redan bearbetats via raketknappen
     anvand_produktdata = extratext and not st.session_state.fil_bearbetad
 
-    if not anvand_produktdata:
-        system_d = "Du är TextFabriken, en glad, vis och effektiv e-handelsassistent på svenska. Svara naturligt och hjälpsamt på användarens fråga eller instruktion."
-        user_d = prompt
-    else:
-        system_d = seo_direktiv
-        user_d = "Användarens extra instruktion: " + prompt + "\n\nProduktdata:\n" + extratext
-
     with st.chat_message("assistant", avatar="🏭"):
-        message_placeholder = st.empty()
-        message_placeholder.markdown("*TextFabriken bearbetar dina ord i molnet...*")
-        
-        ai_svar = fraga_groq(system_d, user_d)
-        
         if anvand_produktdata:
-            ai_svar = ai_svar + "\n\n---\n⚠️ **Kontrollera alltid siffror och specifikationer** mot din egen produktdata innan du publicerar texterna."
-        
-        message_placeholder.markdown(f"**TextFabriken:**\n\n{ai_svar}")
-        st.session_state.messages.append({"role": "assistant", "content": ai_svar})
-        
-        if anvand_produktdata:
+            # Använd samma säkra batch-funktion som raketknappen, för att undvika för stora anrop (413)
+            ai_svar = kor_massgenerering(extra_instruktion=prompt)
+            st.markdown(f"**TextFabriken:**\n\n{ai_svar}")
+            st.session_state.messages.append({"role": "assistant", "content": ai_svar})
             st.session_state.generated_file_content = ai_svar
             st.session_state.show_download = True
-        
+            st.session_state.fil_bearbetad = True
+        else:
+            message_placeholder = st.empty()
+            message_placeholder.markdown("*TextFabriken bearbetar dina ord i molnet...*")
+            system_d = "Du är TextFabriken, en glad, vis och effektiv e-handelsassistent på svenska. Svara naturligt och hjälpsamt på användarens fråga eller instruktion."
+            ai_svar = fraga_groq(system_d, prompt)
+            message_placeholder.markdown(f"**TextFabriken:**\n\n{ai_svar}")
+            st.session_state.messages.append({"role": "assistant", "content": ai_svar})
+
         if uploaded_file is not None:
             st.session_state.saved_sessions[st.session_state.current_session_name] = {"messages": st.session_state.messages, "file_content": st.session_state.generated_file_content, "show_download": st.session_state.show_download}
         st.rerun()
