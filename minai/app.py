@@ -6,7 +6,7 @@ from docx import Document
 
 st.set_page_config(page_title="TextFabriken AI", page_icon="🏭", layout="centered", initial_sidebar_state="expanded")
 
-# --- SÄKRAD API-NYCKEL (Hämtas nu osynligt från Streamlits hemliga valv) ---
+# --- SÄKRAD API-NYCKEL (Hämtas från Streamlits hemliga valv) ---
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 
 # --- INSTÄLLNINGAR & MINNE ---
@@ -93,13 +93,13 @@ if uploaded_file is not None:
 
 # HJÄLPFUNKTION FÖR ATT PRATA MED GROQ I MOLNET
 def fraga_groq(system_prompt, user_prompt):
-    url = "https://api.groq.com/openai/v1/chat/completions"
+    url = "https://groq.com"
     headers = {
         "Authorization": "Bearer " + GROQ_API_KEY,
         "Content-Type": "application/json"
     }
     data = {
-        "model": "llama-3.1-8b-instant",
+        "model": "llama-3.3-70b-versatile",
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
@@ -108,11 +108,11 @@ def fraga_groq(system_prompt, user_prompt):
     }
     respons = requests.post(url, json=data, headers=headers)
     if respons.status_code == 200:
-       return respons.json()["choices"][0]["message"]["content"]
+        return respons.json()["choices"][0]["message"]["content"]
     else:
         return "Fel hos Groq-servern (Status " + str(respons.status_code) + ")"
 
-# LOGIK FÖR RAQUET-KNAPPEN
+# LOGIK FÖR RAKET-KNAPPEN
 if copy_klick:
     if not extratext:
         st.error("⚠️ Du måste välja en fil i rutan till vänster först!")
