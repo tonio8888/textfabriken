@@ -108,7 +108,7 @@ def fraga_groq(system_prompt, user_prompt):
     }
     respons = requests.post(url, json=data, headers=headers)
     if respons.status_code == 200:
-        return respons.json()["choices"][0]["message"]["content"]
+       return respons.json()["choices"][0]["message"]["content"]
     else:
         return "Fel hos Groq-servern (Status " + str(respons.status_code) + ")"
 
