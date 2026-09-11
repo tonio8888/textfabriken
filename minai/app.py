@@ -8,7 +8,7 @@ st.set_page_config(page_title="TextFabriken AI", page_icon="🏭", layout="cente
 
 # --- SPARA DIN GROQ-NYCKEL HÄR ---
 # Klistra in din gsk_... nyckel mellan citattecknen nedan!
-GROQ_API_KEY = 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
+GROQ_API_KEY = "gsk_yoJ4b8FFG7n0kXufonkmGdyb3FYSv2Sdnw0LrjwiqjsQMFq54hF"
 
 # --- INSTÄLLNINGAR & MINNE ---
 if "saved_sessions" not in st.session_state: st.session_state.saved_sessions = {}
