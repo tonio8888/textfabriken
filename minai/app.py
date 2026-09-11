@@ -53,6 +53,7 @@ seo_direktiv = (
     "Du har fått en fil med rådata eller en lista på produkter. Din uppgift är att transformera denna lista till supersäljande, kaxiga och moderna produktbeskrivningar på svenska. "
     "VIKTIGT: Hitta aldrig på exakta siffror, mått, tekniska specifikationer eller prestandavärden (t.ex. batteritid, dB-nivåer, DPI, kapacitet i ml/liter) som inte finns i den rådata du fått. "
     "Om en specifik siffra saknas i underlaget, skriv istället kvalitativt (t.ex. 'lång batteritid' eller 'kraftfull brusreducering') utan att gissa ett exakt tal. "
+    "VIKTIGT: Skapa aldrig fler produkter än de som faktiskt finns i rådatan. Om ett produktnamn består av flera ord (t.ex. 'WalkEasy Vandringskängor'), behandla alltid hela namnet som EN enda produkt – dela aldrig upp det i flera separata produkter. "
     "Varje produkt ska delas upp enligt följande strikta struktur:\n"
     "PRODUKTNAMN (Använd fetstil)\n"
     "SÄLJANDE BESKRIVNING: Skriv cirka 100 ord som skapar ett extremt starkt 'ha-begär' hos kunden.\n"
