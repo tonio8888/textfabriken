@@ -91,16 +91,16 @@ if uploaded_file is not None:
     else:
         extratext = uploaded_file.read().decode("utf-8")
 
-# STENSÄKRAD SAMMANKOPPLING MED GROQ UTAN ADRESSER
+# STENSÄKRAD SAMMANKOPPLING MED GROQ
 def fraga_groq(system_prompt, user_prompt):
     try:
-        url = "https://groq.com"
+        url = "https://api.groq.com/openai/v1/chat/completions"
         headers = {
             "Authorization": "Bearer " + GROQ_API_KEY,
             "Content-Type": "application/json"
         }
         data = {
-            "model": "llama-3.3-70b-versatile",
+            "model": "openai/gpt-oss-120b",
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
