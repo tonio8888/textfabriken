@@ -93,7 +93,7 @@ if uploaded_file is not None:
 
 # HJÄLPFUNKTION FÖR ATT PRATA MED GROQ I MOLNET
 def fraga_groq(system_prompt, user_prompt):
-    url = "https://groq.com"
+    url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {
         "Authorization": "Bearer " + GROQ_API_KEY,
         "Content-Type": "application/json"
