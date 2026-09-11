@@ -6,7 +6,7 @@ from docx import Document
 
 st.set_page_config(page_title="TextFabriken AI", page_icon="🏭", layout="centered", initial_sidebar_state="expanded")
 
-# --- SÄKRAD API-NYCKEL (Hämtas från Streamlits hemliga valv) ---
+# --- SÄKRAD API-NYCKEL (Hämtas från ditt Streamlit-valv) ---
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 
 # --- INSTÄLLNINGAR & MINNE ---
@@ -91,26 +91,29 @@ if uploaded_file is not None:
     else:
         extratext = uploaded_file.read().decode("utf-8")
 
-# HJÄLPFUNKTION FÖR ATT PRATA MED GROQ I MOLNET
+# STENSÄKRAD SAMMANKOPPLING MED GROQ UTAN ADRESSER
 def fraga_groq(system_prompt, user_prompt):
-    url = "https://groq.com"
-    headers = {
-        "Authorization": "Bearer " + GROQ_API_KEY,
-        "Content-Type": "application/json"
-    }
-    data = {
-        "model": "llama-3.3-70b-versatile",
-        "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ],
-        "temperature": 0.3
-    }
-    respons = requests.post(url, json=data, headers=headers)
-    if respons.status_code == 200:
-        return respons.json()["choices"][0]["message"]["content"]
-    else:
-        return "Fel hos Groq-servern (Status " + str(respons.status_code) + ")"
+    try:
+        url = "https://groq.com"
+        headers = {
+            "Authorization": "Bearer " + GROQ_API_KEY,
+            "Content-Type": "application/json"
+        }
+        data = {
+            "model": "llama-3.3-70b-versatile",
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            "temperature": 0.3
+        }
+        respons = requests.post(url, json=data, headers=headers)
+        if respons.status_code == 200:
+            return respons.json()["choices"][0]["message"]["content"]
+        else:
+            return "Anslutningsfel (Status " + str(respons.status_code) + ")"
+    except Exception as e:
+        return "Kunde inte skicka förfrågan."
 
 # LOGIK FÖR RAKET-KNAPPEN
 if copy_klick:
