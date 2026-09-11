@@ -117,6 +117,18 @@ def fraga_groq(system_prompt, user_prompt):
     except Exception as e:
         return "Kunde inte skicka förfrågan."
 
+# --- BATCH-HANTERING FÖR STORA PRODUKTLISTOR ---
+RADER_PER_BATCH = 40  # Justera vid behov: färre rader = säkrare men fler anrop
+
+def dela_upp_i_batchar(text, rader_per_batch=RADER_PER_BATCH):
+    rader = [r for r in text.strip().split('\n') if r.strip() != ""]
+    batchar = []
+    for i in range(0, len(rader), rader_per_batch):
+        batch = '\n'.join(rader[i:i + rader_per_batch])
+        if batch.strip():
+            batchar.append(batch)
+    return batchar if batchar else [text]
+
 # LOGIK FÖR RAKET-KNAPPEN
 if copy_klick:
     if not extratext:
@@ -127,10 +139,21 @@ if copy_klick:
         st.session_state.messages.append({"role": "user", "content": prompt_text})
         with st.chat_message("assistant", avatar="🏭"):
             message_placeholder = st.empty()
-            message_placeholder.markdown("*Maskinerna i TextFabriken startar upp i molnet...*")
-            
-            ai_svar = fraga_groq(seo_direktiv, "Produktlista/Rådata:\n" + extratext)
-            
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+
+            batchar = dela_upp_i_batchar(extratext)
+            alla_svar = []
+            for i, batch in enumerate(batchar):
+                status_text.markdown(f"*Bearbetar del {i + 1} av {len(batchar)} i TextFabrikens maskiner...*")
+                svar = fraga_groq(seo_direktiv, "Produktlista/Rådata:\n" + batch)
+                alla_svar.append(svar)
+                progress_bar.progress((i + 1) / len(batchar))
+
+            status_text.empty()
+            progress_bar.empty()
+
+            ai_svar = "\n\n---\n\n".join(alla_svar)
             ai_svar_med_varning = ai_svar + "\n\n---\n⚠️ **Kontrollera alltid siffror och specifikationer** (t.ex. batteritid, mått, prestanda) mot din egen produktdata innan du publicerar texterna."
             message_placeholder.markdown(f"**TextFabriken:**\n\n{ai_svar_med_varning}")
             st.session_state.messages.append({"role": "assistant", "content": ai_svar_med_varning})
