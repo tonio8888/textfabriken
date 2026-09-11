@@ -131,10 +131,10 @@ if copy_klick:
             
             ai_svar = fraga_groq(seo_direktiv, "Produktlista/Rådata:\n" + extratext)
             
-            message_placeholder.markdown(f"**TextFabriken:**\n\n{ai_svar}")
-            st.warning("⚠️ Kontrollera alltid siffror och specifikationer (t.ex. batteritid, mått, prestanda) mot din egen produktdata innan du publicerar texterna. AI:n kan ibland generera detaljer som låter rimliga men inte stämmer.")
-            st.session_state.messages.append({"role": "assistant", "content": ai_svar})
-            st.session_state.generated_file_content = ai_svar
+            ai_svar_med_varning = ai_svar + "\n\n---\n⚠️ **Kontrollera alltid siffror och specifikationer** (t.ex. batteritid, mått, prestanda) mot din egen produktdata innan du publicerar texterna."
+            message_placeholder.markdown(f"**TextFabriken:**\n\n{ai_svar_med_varning}")
+            st.session_state.messages.append({"role": "assistant", "content": ai_svar_med_varning})
+            st.session_state.generated_file_content = ai_svar_med_varning
             st.session_state.show_download = True
             st.session_state.saved_sessions[st.session_state.current_session_name] = {"messages": st.session_state.messages, "file_content": st.session_state.generated_file_content, "show_download": st.session_state.show_download}
             st.rerun()
@@ -157,11 +157,13 @@ if prompt:
         
         ai_svar = fraga_groq(system_d, user_d)
         
+        if extratext:
+            ai_svar = ai_svar + "\n\n---\n⚠️ **Kontrollera alltid siffror och specifikationer** mot din egen produktdata innan du publicerar texterna."
+        
         message_placeholder.markdown(f"**TextFabriken:**\n\n{ai_svar}")
         st.session_state.messages.append({"role": "assistant", "content": ai_svar})
         
         if extratext:
-            st.warning("⚠️ Kontrollera alltid siffror och specifikationer mot din egen produktdata innan du publicerar texterna.")
             st.session_state.generated_file_content = ai_svar
             st.session_state.show_download = True
         else:
