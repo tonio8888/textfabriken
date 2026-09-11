@@ -16,6 +16,8 @@ if "current_session_name" not in st.session_state: st.session_state.current_sess
 if "messages" not in st.session_state: st.session_state.messages = []
 if "generated_file_content" not in st.session_state: st.session_state.generated_file_content = ""
 if "show_download" not in st.session_state: st.session_state.show_download = False
+if "fil_bearbetad" not in st.session_state: st.session_state.fil_bearbetad = False
+if "senast_uppladdad_fil" not in st.session_state: st.session_state.senast_uppladdad_fil = None
 
 # Huvudsida
 st.title("🏭 TEXTFABRIKEN AI")
@@ -79,6 +81,11 @@ with st.container():
 # Processa filen
 if uploaded_file is not None:
     st.session_state.current_session_name = uploaded_file.name
+    # Om det är en NY fil (annat namn än senast), återställ "bearbetad"-flaggan
+    if uploaded_file.name != st.session_state.senast_uppladdad_fil:
+        st.session_state.fil_bearbetad = False
+        st.session_state.senast_uppladdad_fil = uploaded_file.name
+
     if uploaded_file.name.endswith(".pdf"):
         try:
             pdf_reader = PdfReader(uploaded_file)
@@ -170,6 +177,7 @@ if copy_klick:
             st.session_state.messages.append({"role": "assistant", "content": ai_svar_med_varning})
             st.session_state.generated_file_content = ai_svar_med_varning
             st.session_state.show_download = True
+            st.session_state.fil_bearbetad = True  # Markera filen som klar - chatten blir nu fri
             st.session_state.saved_sessions[st.session_state.current_session_name] = {"messages": st.session_state.messages, "file_content": st.session_state.generated_file_content, "show_download": st.session_state.show_download}
             st.rerun()
 
@@ -178,8 +186,11 @@ if prompt:
     with st.chat_message("user", avatar="👤"): st.markdown(f"**Du:** {prompt}")
     st.session_state.messages.append({"role": "user", "content": prompt})
 
-    if not extratext:
-        system_d = "Du är TextFabriken, en glad, vis och effektiv e-handelsassistent på svenska. Hälsa användaren välkommen till TextFabriken och be dem klicka på gemet (📎) längst ner för att mata in sin produktfakta."
+    # Skicka bara med hela produktlistan om filen INTE redan bearbetats via raketknappen
+    anvand_produktdata = extratext and not st.session_state.fil_bearbetad
+
+    if not anvand_produktdata:
+        system_d = "Du är TextFabriken, en glad, vis och effektiv e-handelsassistent på svenska. Svara naturligt och hjälpsamt på användarens fråga eller instruktion."
         user_d = prompt
     else:
         system_d = seo_direktiv
@@ -191,17 +202,15 @@ if prompt:
         
         ai_svar = fraga_groq(system_d, user_d)
         
-        if extratext:
+        if anvand_produktdata:
             ai_svar = ai_svar + "\n\n---\n⚠️ **Kontrollera alltid siffror och specifikationer** mot din egen produktdata innan du publicerar texterna."
         
         message_placeholder.markdown(f"**TextFabriken:**\n\n{ai_svar}")
         st.session_state.messages.append({"role": "assistant", "content": ai_svar})
         
-        if extratext:
+        if anvand_produktdata:
             st.session_state.generated_file_content = ai_svar
             st.session_state.show_download = True
-        else:
-            st.session_state.show_download = False
         
         if uploaded_file is not None:
             st.session_state.saved_sessions[st.session_state.current_session_name] = {"messages": st.session_state.messages, "file_content": st.session_state.generated_file_content, "show_download": st.session_state.show_download}
