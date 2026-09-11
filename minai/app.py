@@ -50,6 +50,8 @@ for message in st.session_state.messages:
 seo_direktiv = (
     "Du är TextFabriken, en absolut världsmästare på e-handel, digital marknadsföring och SEO-copywriting för den nordiska marknaden. "
     "Du har fått en fil med rådata eller en lista på produkter. Din uppgift är att transformera denna lista till supersäljande, kaxiga och moderna produktbeskrivningar på svenska. "
+    "VIKTIGT: Hitta aldrig på exakta siffror, mått, tekniska specifikationer eller prestandavärden (t.ex. batteritid, dB-nivåer, DPI, kapacitet i ml/liter) som inte finns i den rådata du fått. "
+    "Om en specifik siffra saknas i underlaget, skriv istället kvalitativt (t.ex. 'lång batteritid' eller 'kraftfull brusreducering') utan att gissa ett exakt tal. "
     "Varje produkt ska delas upp enligt följande strikta struktur:\n"
     "PRODUKTNAMN (Använd fetstil)\n"
     "SÄLJANDE BESKRIVNING: Skriv cirka 100 ord som skapar ett extremt starkt 'ha-begär' hos kunden.\n"
@@ -130,6 +132,7 @@ if copy_klick:
             ai_svar = fraga_groq(seo_direktiv, "Produktlista/Rådata:\n" + extratext)
             
             message_placeholder.markdown(f"**TextFabriken:**\n\n{ai_svar}")
+            st.warning("⚠️ Kontrollera alltid siffror och specifikationer (t.ex. batteritid, mått, prestanda) mot din egen produktdata innan du publicerar texterna. AI:n kan ibland generera detaljer som låter rimliga men inte stämmer.")
             st.session_state.messages.append({"role": "assistant", "content": ai_svar})
             st.session_state.generated_file_content = ai_svar
             st.session_state.show_download = True
@@ -158,6 +161,7 @@ if prompt:
         st.session_state.messages.append({"role": "assistant", "content": ai_svar})
         
         if extratext:
+            st.warning("⚠️ Kontrollera alltid siffror och specifikationer mot din egen produktdata innan du publicerar texterna.")
             st.session_state.generated_file_content = ai_svar
             st.session_state.show_download = True
         else:
@@ -171,6 +175,7 @@ if prompt:
 if st.session_state.show_download and st.session_state.generated_file_content:
     st.write("---")
     st.markdown("### 📥 Din färdiga Word-fil från TextFabriken är klar!")
+    st.info("💡 Innan du publicerar: dubbelkolla alla siffror (mått, kapacitet, batteritid, dB-nivåer m.m.) mot leverantörens originaldata. TextFabriken skriver säljande texter, men ansvarar inte för att specifikationerna är korrekta.")
     doc = Document()
     doc.add_heading("SEO Produktbeskrivningar - TextFabriken AI", level=1)
     rensad_text = st.session_state.generated_file_content.replace("**TextFabriken:**\n\n", "")
