@@ -107,7 +107,8 @@ def fraga_groq(system_prompt, user_prompt):
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            "temperature": 0.3
+            "temperature": 0.3,
+            "max_tokens": 8000
         }
         respons = requests.post(url, json=data, headers=headers)
         if respons.status_code == 200:
@@ -118,7 +119,7 @@ def fraga_groq(system_prompt, user_prompt):
         return "Kunde inte skicka förfrågan."
 
 # --- BATCH-HANTERING FÖR STORA PRODUKTLISTOR ---
-RADER_PER_BATCH = 40  # Justera vid behov: färre rader = säkrare men fler anrop
+RADER_PER_BATCH = 15  # Justera vid behov: färre rader = säkrare men fler anrop
 
 def dela_upp_i_batchar(text, rader_per_batch=RADER_PER_BATCH):
     rader = [r for r in text.strip().split('\n') if r.strip() != ""]
