@@ -7,8 +7,7 @@ from docx import Document
 st.set_page_config(page_title="TextFabriken AI", page_icon="🏭", layout="centered", initial_sidebar_state="expanded")
 
 # --- SPARA DIN GROQ-NYCKEL HÄR ---
-# Klistra in din gsk_... nyckel mellan citattecknen nedan!
-GROQ_API_KEY = "gsk_yoJ4b8FFG7n0kXufonkmGdyb3FYSv2Sdnw0LrjwiqjsQMFq54hF"
+GROQ_API_KEY = "HÄR_KLISTRAR_DU_IN_DIN_GSK_NYCKEL"
 
 # --- INSTÄLLNINGAR & MINNE ---
 if "saved_sessions" not in st.session_state: st.session_state.saved_sessions = {}
@@ -94,9 +93,9 @@ if uploaded_file is not None:
 
 # HJÄLPFUNKTION FÖR ATT PRATA MED GROQ I MOLNET
 def fraga_groq(system_prompt, user_prompt):
-    url = "https://groq.com"
+    url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Authorization": "Bearer " + GROQ_API_KEY,
         "Content-Type": "application/json"
     }
     data = {
@@ -109,9 +108,9 @@ def fraga_groq(system_prompt, user_prompt):
     }
     respons = requests.post(url, json=data, headers=headers)
     if respons.status_code == 200:
-        return respons.json()["choices"][0]["message"]["content"]
+        return respons.json()["choices"]["message"]["content"]
     else:
-        return f"Fel hos Groq-servern (Status {respons.status_code})"
+        return "Fel hos Groq-servern (Status " + str(respons.status_code) + ")"
 
 # LOGIK FÖR RAQUET-KNAPPEN
 if copy_klick:
@@ -125,7 +124,7 @@ if copy_klick:
             message_placeholder = st.empty()
             message_placeholder.markdown("*Maskinerna i TextFabriken startar upp i molnet...*")
             
-            ai_svar = fraga_groq(seo_direktiv, f"Produktlista/Rådata:\n{extratext}")
+            ai_svar = fraga_groq(seo_direktiv, "Produktlista/Rådata:\n" + extratext)
             
             message_placeholder.markdown(f"**TextFabriken:**\n\n{ai_svar}")
             st.session_state.messages.append({"role": "assistant", "content": ai_svar})
@@ -144,7 +143,7 @@ if prompt:
         user_d = prompt
     else:
         system_d = seo_direktiv
-        user_d = f"Användarens extra instruktion: {prompt}\n\nProduktdata:\n{extratext}"
+        user_d = "Användarens extra instruktion: " + prompt + "\n\nProduktdata:\n" + extratext
 
     with st.chat_message("assistant", avatar="🏭"):
         message_placeholder = st.empty()
@@ -176,4 +175,3 @@ if st.session_state.show_download and st.session_state.generated_file_content:
     bio = io.BytesIO()
     doc.save(bio)
     st.download_button(label="📝 Ladda ner produkttexter (.docx)", data=bio.getvalue(), file_name="textfabriken_produkter.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-    
