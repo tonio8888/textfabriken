@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import time
 from pypdf import PdfReader
 import io
 from docx import Document
@@ -93,33 +94,38 @@ if uploaded_file is not None:
     else:
         extratext = uploaded_file.read().decode("utf-8")
 
-# STENSÄKRAD SAMMANKOPPLING MED GROQ
-def fraga_groq(system_prompt, user_prompt):
-    try:
-        url = "https://api.groq.com/openai/v1/chat/completions"
-        headers = {
-            "Authorization": "Bearer " + GROQ_API_KEY,
-            "Content-Type": "application/json"
-        }
-        data = {
-            "model": "openai/gpt-oss-120b",
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
-            ],
-            "temperature": 0.3,
-            "max_tokens": 8000
-        }
-        respons = requests.post(url, json=data, headers=headers)
-        if respons.status_code == 200:
-            return respons.json()["choices"][0]["message"]["content"]
-        else:
-            return "Anslutningsfel (Status " + str(respons.status_code) + ")"
-    except Exception as e:
-        return "Kunde inte skicka förfrågan."
+# STENSÄKRAD SAMMANKOPPLING MED GROQ (med automatiska omförsök vid rate limit)
+def fraga_groq(system_prompt, user_prompt, forsok=3):
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": "Bearer " + GROQ_API_KEY,
+        "Content-Type": "application/json"
+    }
+    data = {
+        "model": "openai/gpt-oss-120b",
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        "temperature": 0.3,
+        "max_tokens": 8000
+    }
+    for i in range(forsok):
+        try:
+            respons = requests.post(url, json=data, headers=headers)
+            if respons.status_code == 200:
+                return respons.json()["choices"][0]["message"]["content"]
+            elif respons.status_code == 429:
+                time.sleep(5)  # Vänta 5 sekunder och försök igen
+                continue
+            else:
+                return "Anslutningsfel (Status " + str(respons.status_code) + ")"
+        except Exception as e:
+            return "Kunde inte skicka förfrågan."
+    return "Groq-servern är överbelastad just nu (Status 429). Försök igen om en liten stund."
 
 # --- BATCH-HANTERING FÖR STORA PRODUKTLISTOR ---
-RADER_PER_BATCH = 15  # Justera vid behov: färre rader = säkrare men fler anrop
+RADER_PER_BATCH = 15  # Sänkt från 40 för att undvika avkapade svar
 
 def dela_upp_i_batchar(text, rader_per_batch=RADER_PER_BATCH):
     rader = [r for r in text.strip().split('\n') if r.strip() != ""]
@@ -150,6 +156,8 @@ if copy_klick:
                 svar = fraga_groq(seo_direktiv, "Produktlista/Rådata:\n" + batch)
                 alla_svar.append(svar)
                 progress_bar.progress((i + 1) / len(batchar))
+                if i < len(batchar) - 1:
+                    time.sleep(2)  # Kort paus mellan batchar för att undvika rate limit
 
             status_text.empty()
             progress_bar.empty()
