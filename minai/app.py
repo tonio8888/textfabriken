@@ -67,7 +67,7 @@ copy_klick = False
 with st.container():
     prompt = st.chat_input("Skriv instruktion till fabriken...")
     with st.expander("📎 Klicka här för att mata in produktfakta (PDF/TXT/WORD)"):
-        col1, col2 = st.columns()
+        col1, col2 = st.columns(2)
         with col1:
             uploaded_file = st.file_uploader("Välj dokument från din dator", type=["pdf", "txt", "docx"], label_visibility="collapsed")
         with col2:
