@@ -99,7 +99,7 @@ def fraga_groq(system_prompt, user_prompt):
         "Content-Type": "application/json"
     }
     data = {
-        "model": "openai/gpt-oss-20b",  # CLAUDE-RÄTTELSE 1: Ny modern Groq-modell!
+        "model": "llama-3.3-70b-versatile",
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
@@ -108,7 +108,6 @@ def fraga_groq(system_prompt, user_prompt):
     }
     respons = requests.post(url, json=data, headers=headers)
     if respons.status_code == 200:
-        # CLAUDE-RÄTTELSE 2: Rätt indexering [0] för listan!
         return respons.json()["choices"][0]["message"]["content"]
     else:
         return "Fel hos Groq-servern (Status " + str(respons.status_code) + ")"
