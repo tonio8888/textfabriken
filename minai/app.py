@@ -96,7 +96,7 @@ if uploaded_file is not None:
         extratext = uploaded_file.read().decode("utf-8")
 
 # STENSÄKRAD SAMMANKOPPLING MED GROQ (med automatiska omförsök vid rate limit)
-def fraga_groq(system_prompt, user_prompt, forsok=3):
+def fraga_groq(system_prompt, user_prompt, forsok=5):
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {
         "Authorization": "Bearer " + GROQ_API_KEY,
@@ -117,7 +117,8 @@ def fraga_groq(system_prompt, user_prompt, forsok=3):
             if respons.status_code == 200:
                 return respons.json()["choices"][0]["message"]["content"]
             elif respons.status_code == 429:
-                time.sleep(5)  # Vänta 5 sekunder och försök igen
+                vantetid = int(float(respons.headers.get("Retry-After", 10))) + 1
+                time.sleep(vantetid)
                 continue
             else:
                 return "Anslutningsfel (Status " + str(respons.status_code) + ")"
