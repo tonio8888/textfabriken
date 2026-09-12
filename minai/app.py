@@ -3,6 +3,7 @@ import requests
 import time
 import sqlite3
 import json
+import uuid
 from pypdf import PdfReader
 import io
 from docx import Document
@@ -20,6 +21,7 @@ UI_TEXTS = {
         "subheader": "Nordens smartaste löpande band for produktbeskrivningar",
         "intro": "Ladda upp din rådata i bottenmenyn. TextFabriken transformerar den till säljande SEO-texter och skapar en färdig Word-fil åt dig!",
         "lang_label": "🌐 Språk för texter och gränssnitt",
+        "workspace_info": "🔑 Din arbetsyta-kod: **{kod}**\n\nSpara den här sidans webbadress (bokmärk fliken) för att komma tillbaka till dina sparade listor senare.",
         "saved_header": "📁 Sparade produktlistor",
         "no_saved": "Inga sparade listor ännu.",
         "active_now": "Aktiv nu:",
@@ -53,6 +55,7 @@ UI_TEXTS = {
         "subheader": "Nordens smarteste samlebånd for produktbeskrivelser",
         "intro": "Last opp rådataene dine i menyen nederst. TextFabriken forvandler dem til salgsfremmende SEO-tekster og lager en ferdig Word-fil for deg!",
         "lang_label": "🌐 Språk for tekster og grensesnitt",
+        "workspace_info": "🔑 Din arbeidsflate-kode: **{kod}**\n\nLagre nettadressen til denne siden (bokmerk fanen) for å komme tilbake til dine lagrede lister senere.",
         "saved_header": "📁 Lagrede produktlister",
         "no_saved": "Ingen lagrede lister ennå.",
         "active_now": "Aktiv nå:",
@@ -86,6 +89,7 @@ UI_TEXTS = {
         "subheader": "Nordens smarteste samlebånd til produktbeskrivelser",
         "intro": "Upload dine rådata i menuen nedenfor. TextFabriken forvandler dem til salgsfremmende SEO-tekster og genererer en færdig Word-fil til dig!",
         "lang_label": "🌐 Sprog til tekster og brugerflade",
+        "workspace_info": "🔑 Din arbejdsområde-kode: **{kod}**\n\nGem denne sides webadresse (sæt bogmærke i fanen) for at komme tilbage til dine gemte lister senere.",
         "saved_header": "📁 Gemte produktlister",
         "no_saved": "Ingen gemte lister endnu.",
         "active_now": "Aktiv nu:",
@@ -119,6 +123,7 @@ UI_TEXTS = {
         "subheader": "Pohjolan fiksuin tuotantolinja tuotekuvauksille",
         "intro": "Lataa raakadatasi alavalikossa. TextFabriken muuttaa sen myyväksi SEO-tekstiksi ja luo sinulle valmiin Word-tiedoston!",
         "lang_label": "🌐 Tekstien ja käyttöliittymän kieli",
+        "workspace_info": "🔑 Työtilasi koodi: **{kod}**\n\nTallenna tämän sivun verkko-osoite (lisää kirjanmerkki) päästäksesi takaisin tallennettuihin listoihisi myöhemmin.",
         "saved_header": "📁 Tallennetut tuotelistat",
         "no_saved": "Ei vielä tallennettuja listoja.",
         "active_now": "Aktiivinen nyt:",
@@ -154,6 +159,7 @@ UI_TEXTS = {
         "subheader": "The Nordics' smartest assembly line for product descriptions",
         "intro": "Upload your raw data in the menu below. TextFabriken transforms it into compelling SEO copy and creates a ready-made Word file for you!",
         "lang_label": "🌐 Language for texts and interface",
+        "workspace_info": "🔑 Your workspace code: **{kod}**\n\nSave this page's URL (bookmark the tab) to return to your saved lists later.",
         "saved_header": "📁 Saved product lists",
         "no_saved": "No saved lists yet.",
         "active_now": "Currently active:",
@@ -259,7 +265,7 @@ SEO_DIREKTIV = {
     ),
 }
 
-# --- DATABAS FÖR PERMANENT LAGRING AV SPARADE PRODUKTLISTOR ---
+# --- DATABAS FÖR PERMANENT LAGRING AV SPARADE PRODUKTLISTOR (uppdelat per kund) ---
 DB_FIL = "textfabriken.db"
 
 def db_init():
@@ -267,33 +273,35 @@ def db_init():
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS sessioner (
-            namn TEXT PRIMARY KEY,
+            kund_id TEXT NOT NULL,
+            namn TEXT NOT NULL,
             messages TEXT,
             file_content TEXT,
-            show_download INTEGER
+            show_download INTEGER,
+            PRIMARY KEY (kund_id, namn)
         )
     """)
     conn.commit()
     conn.close()
 
-def db_spara_session(namn, messages, file_content, show_download):
+def db_spara_session(kund_id, namn, messages, file_content, show_download):
     conn = sqlite3.connect(DB_FIL)
     cursor = conn.cursor()
     cursor.execute("""
-        INSERT INTO sessioner (namn, messages, file_content, show_download)
-        VALUES (?, ?, ?, ?)
-        ON CONFLICT(namn) DO UPDATE SET
+        INSERT INTO sessioner (kund_id, namn, messages, file_content, show_download)
+        VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(kund_id, namn) DO UPDATE SET
             messages=excluded.messages,
             file_content=excluded.file_content,
             show_download=excluded.show_download
-    """, (namn, json.dumps(messages), file_content, int(show_download)))
+    """, (kund_id, namn, json.dumps(messages), file_content, int(show_download)))
     conn.commit()
     conn.close()
 
-def db_hamta_alla_sessioner():
+def db_hamta_alla_sessioner(kund_id):
     conn = sqlite3.connect(DB_FIL)
     cursor = conn.cursor()
-    cursor.execute("SELECT namn, messages, file_content, show_download FROM sessioner")
+    cursor.execute("SELECT namn, messages, file_content, show_download FROM sessioner WHERE kund_id = ?", (kund_id,))
     rader = cursor.fetchall()
     conn.close()
     sessioner = {}
@@ -307,9 +315,18 @@ def db_hamta_alla_sessioner():
 
 db_init()
 
+# --- TILLDELA EN UNIK ARBETSYTEKOD PER BESÖKARE (håller sparade listor separata mellan kunder) ---
+if "kod" in st.query_params:
+    kund_id = st.query_params["kod"]
+else:
+    kund_id = uuid.uuid4().hex[:10]
+    st.query_params["kod"] = kund_id
+if "kund_id" not in st.session_state:
+    st.session_state.kund_id = kund_id
+
 # --- INSTÄLLNINGAR & MINNE ---
 if "saved_sessions" not in st.session_state:
-    st.session_state.saved_sessions = db_hamta_alla_sessioner()  # Läs in tidigare sparade listor från databasen
+    st.session_state.saved_sessions = db_hamta_alla_sessioner(st.session_state.kund_id)  # Läs in ENDAST denna kunds sparade listor
 if "current_session_name" not in st.session_state: st.session_state.current_session_name = "Aktuell produktlista"
 if "messages" not in st.session_state: st.session_state.messages = []
 if "generated_file_content" not in st.session_state: st.session_state.generated_file_content = ""
@@ -334,6 +351,9 @@ with st.sidebar:
     if vald_sprak != st.session_state.sprak:
         st.session_state.sprak = vald_sprak
         st.rerun()
+
+    st.write("---")
+    st.caption(t["workspace_info"].format(kod=st.session_state.kund_id))
 
     st.write("---")
     st.markdown(f"### {t['saved_header']}")
@@ -480,7 +500,7 @@ if copy_klick:
             st.session_state.show_download = True
             st.session_state.fil_bearbetad = True  # Markera filen som klar - chatten blir nu fri
             st.session_state.saved_sessions[st.session_state.current_session_name] = {"messages": st.session_state.messages, "file_content": st.session_state.generated_file_content, "show_download": st.session_state.show_download}
-            db_spara_session(st.session_state.current_session_name, st.session_state.messages, st.session_state.generated_file_content, st.session_state.show_download)
+            db_spara_session(st.session_state.kund_id, st.session_state.current_session_name, st.session_state.messages, st.session_state.generated_file_content, st.session_state.show_download)
             st.rerun()
 
 # LOGIK FÖR VANLIGA CHATTRUTAN
@@ -513,7 +533,7 @@ if prompt:
 
         if uploaded_file is not None:
             st.session_state.saved_sessions[st.session_state.current_session_name] = {"messages": st.session_state.messages, "file_content": st.session_state.generated_file_content, "show_download": st.session_state.show_download}
-            db_spara_session(st.session_state.current_session_name, st.session_state.messages, st.session_state.generated_file_content, st.session_state.show_download)
+            db_spara_session(st.session_state.kund_id, st.session_state.current_session_name, st.session_state.messages, st.session_state.generated_file_content, st.session_state.show_download)
         st.rerun()
 
 # VISA WORD-KNAPP
