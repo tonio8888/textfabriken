@@ -40,6 +40,12 @@ button[kind="primary"] {
     padding: 0.75rem 1rem;
     margin-bottom: 0.5rem;
 }
+[data-testid="stAppViewContainer"] > .main .block-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
+}
 </style>
 """, unsafe_allow_html=True)
 
