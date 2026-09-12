@@ -282,6 +282,23 @@ def db_init():
         )
     """)
     conn.commit()
+    # Migrering: om tabellen finns sedan tidigare UTAN kund_id-kolumnen (gammal version av appen),
+    # återskapas den med rätt struktur. Gammal osparad testdata utan kund_id kan inte återanvändas säkert.
+    cursor.execute("PRAGMA table_info(sessioner)")
+    kolumner = [rad[1] for rad in cursor.fetchall()]
+    if "kund_id" not in kolumner:
+        cursor.execute("DROP TABLE sessioner")
+        cursor.execute("""
+            CREATE TABLE sessioner (
+                kund_id TEXT NOT NULL,
+                namn TEXT NOT NULL,
+                messages TEXT,
+                file_content TEXT,
+                show_download INTEGER,
+                PRIMARY KEY (kund_id, namn)
+            )
+        """)
+        conn.commit()
     conn.close()
 
 def db_spara_session(kund_id, namn, messages, file_content, show_download):
