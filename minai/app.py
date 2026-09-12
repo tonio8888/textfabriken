@@ -25,7 +25,7 @@ UI_TEXTS = {
         "intro": "Ladda upp din rådata i bottenmenyn. TextFabriken transformerar den till säljande SEO-texter och skapar en färdig Word-fil åt dig!",
         "lang_label": "🌐 Språk för texter och gränssnitt",
         "workspace_info": "🔑 Din arbetsyta-kod: **{kod}**\n\nSpara den här sidans webbadress (bokmärk fliken) för att komma tillbaka till dina sparade listor senare.",
-        "saved_header": "📁 Sparade produktlistor",
+        "saved_header": "🗃️ Sparade produktlistor",
         "no_saved": "Inga sparade listor ännu.",
         "active_now": "Aktiv nu:",
         "chat_placeholder": "Skriv instruktion till fabriken...",
@@ -74,7 +74,7 @@ UI_TEXTS = {
         "intro": "Last opp rådataene dine i menyen nederst. TextFabriken forvandler dem til salgsfremmende SEO-tekster og lager en ferdig Word-fil for deg!",
         "lang_label": "🌐 Språk for tekster og grensesnitt",
         "workspace_info": "🔑 Din arbeidsflate-kode: **{kod}**\n\nLagre nettadressen til denne siden (bokmerk fanen) for å komme tilbake til dine lagrede lister senere.",
-        "saved_header": "📁 Lagrede produktlister",
+        "saved_header": "🗃️ Lagrede produktlister",
         "no_saved": "Ingen lagrede lister ennå.",
         "active_now": "Aktiv nå:",
         "chat_placeholder": "Skriv en instruksjon til fabrikken...",
@@ -123,7 +123,7 @@ UI_TEXTS = {
         "intro": "Upload dine rådata i menuen nedenfor. TextFabriken forvandler dem til salgsfremmende SEO-tekster og genererer en færdig Word-fil til dig!",
         "lang_label": "🌐 Sprog til tekster og brugerflade",
         "workspace_info": "🔑 Din arbejdsområde-kode: **{kod}**\n\nGem denne sides webadresse (sæt bogmærke i fanen) for at komme tilbage til dine gemte lister senere.",
-        "saved_header": "📁 Gemte produktlister",
+        "saved_header": "🗃️ Gemte produktlister",
         "no_saved": "Ingen gemte lister endnu.",
         "active_now": "Aktiv nu:",
         "chat_placeholder": "Skriv en instruktion til fabrikken...",
@@ -172,7 +172,7 @@ UI_TEXTS = {
         "intro": "Lataa raakadatasi alavalikossa. TextFabriken muuttaa sen myyväksi SEO-tekstiksi ja luo sinulle valmiin Word-tiedoston!",
         "lang_label": "🌐 Tekstien ja käyttöliittymän kieli",
         "workspace_info": "🔑 Työtilasi koodi: **{kod}**\n\nTallenna tämän sivun verkko-osoite (lisää kirjanmerkki) päästäksesi takaisin tallennettuihin listoihisi myöhemmin.",
-        "saved_header": "📁 Tallennetut tuotelistat",
+        "saved_header": "🗃️ Tallennetut tuotelistat",
         "no_saved": "Ei vielä tallennettuja listoja.",
         "active_now": "Aktiivinen nyt:",
         "chat_placeholder": "Kirjoita ohje tehtaalle...",
@@ -223,7 +223,7 @@ UI_TEXTS = {
         "intro": "Upload your raw data in the menu below. TextFabriken transforms it into compelling SEO copy and creates a ready-made Word file for you!",
         "lang_label": "🌐 Language for texts and interface",
         "workspace_info": "🔑 Your workspace code: **{kod}**\n\nSave this page's URL (bookmark the tab) to return to your saved lists later.",
-        "saved_header": "📁 Saved product lists",
+        "saved_header": "🗃️ Saved product lists",
         "no_saved": "No saved lists yet.",
         "active_now": "Currently active:",
         "chat_placeholder": "Write an instruction to the factory...",
@@ -652,9 +652,6 @@ with st.sidebar:
         st.rerun()
 
     st.write("---")
-    st.caption(t["workspace_info"].format(kod=st.session_state.kund_id))
-
-    st.write("---")
     st.markdown(f"### {t['saved_header']}")
     if st.session_state.saved_sessions:
         for session_title in st.session_state.saved_sessions.keys():
@@ -666,6 +663,10 @@ with st.sidebar:
                 st.rerun()
     else:
         st.caption(t["no_saved"])
+
+    st.write("---")
+    st.caption(t["workspace_info"].format(kod=st.session_state.kund_id))
+
     st.write("---")
     st.caption(f"{t['active_now']} {st.session_state.current_session_name}")
 
