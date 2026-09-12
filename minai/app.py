@@ -5,11 +5,15 @@ import sqlite3
 import json
 import uuid
 import csv
+import os
 from pypdf import PdfReader
 import io
 from docx import Document
 from openpyxl import Workbook
 from openpyxl.styles import Font
+
+# Sökväg till avatar-bilden, oberoende av varifrån Streamlit körs
+AVATAR_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "textfabriken_avatar.png")
 
 st.set_page_config(page_title="TextFabriken AI", page_icon="🏭", layout="centered", initial_sidebar_state="expanded")
 
@@ -712,7 +716,7 @@ for message in st.session_state.messages:
     if message["role"] == "user":
         with st.chat_message("user", avatar="👤"): st.markdown(f"**{t['user_label']}:** {message['content']}")
     else:
-        with st.chat_message("assistant", avatar="🏭"): st.markdown(f"**{t['assistant_label']}:** {message['content']}")
+        with st.chat_message("assistant", avatar=AVATAR_PATH): st.markdown(f"**{t['assistant_label']}:** {message['content']}")
 
 # --- FASTKLISTRAD INPUT & FILER I BOTTEN ---
 uploaded_file = None
@@ -853,7 +857,7 @@ if copy_klick:
         prompt_text = t["mass_prompt_text"]
         with st.chat_message("user", avatar="👤"): st.markdown(f"**{t['user_label']}:** {prompt_text}")
         st.session_state.messages.append({"role": "user", "content": prompt_text})
-        with st.chat_message("assistant", avatar="🏭"):
+        with st.chat_message("assistant", avatar=AVATAR_PATH):
             ai_svar_med_varning = kor_massgenerering()
             if ai_svar_med_varning is not None:  # None = alla batchar misslyckades, felmeddelande redan visat
                 st.markdown(f"**{t['assistant_label']}:**\n\n{ai_svar_med_varning}")
@@ -881,7 +885,7 @@ if prompt:
     # chattmeddelandet som rå produktdata (samma strukturerade pipeline, med export-stöd)
     anvand_chatt_som_produktdata = behandla_som_produkt and not extratext
 
-    with st.chat_message("assistant", avatar="🏭"):
+    with st.chat_message("assistant", avatar=AVATAR_PATH):
         if anvand_produktdata or anvand_chatt_som_produktdata:
             # Använd samma säkra batch-funktion som raketknappen, för att undvika för stora anrop (413)
             if anvand_chatt_som_produktdata:
