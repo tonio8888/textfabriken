@@ -15,7 +15,7 @@ from openpyxl.styles import Font
 # Sökväg till avatar-bilden, oberoende av varifrån Streamlit körs
 AVATAR_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "textfabriken_avatar.png")
 
-st.set_page_config(page_title="TextFabriken AI", page_icon="🏭", layout="centered", initial_sidebar_state="expanded")
+st.set_page_config(page_title="TextFabriken AI", page_icon=AVATAR_PATH, layout="centered", initial_sidebar_state="expanded")
 
 # --- ANPASSAD STYLING (rundare knappar, snyggare chattbubblor) ---
 st.markdown("""
