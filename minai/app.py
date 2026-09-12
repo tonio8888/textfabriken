@@ -45,6 +45,7 @@ UI_TEXTS = {
         "batch_failure_warning": "⚠️ {failed} av {total} delar kunde inte genereras på grund av ett tillfälligt serverfel. Produkterna i dessa delar saknas nedan – testa att köra igen om en liten stund.",
         "all_failed_error": "❌ Kunde inte generera några texter just nu på grund av ett serverfel. Försök igen om en liten stund.",
         "search_placeholder": "🔍 Sök efter en produkt på namn...",
+        "tone_label": "🎨 Tonläge för de genererade texterna",
         "warning_text": "⚠️ **Kontrollera alltid siffror och specifikationer** (t.ex. batteritid, mått, prestanda) mot din egen produktdata innan du publicerar texterna.",
         "processing_batch": "*Bearbetar del {i} av {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken bearbetar dina ord i molnet...*",
@@ -88,6 +89,7 @@ UI_TEXTS = {
         "batch_failure_warning": "⚠️ {failed} av {total} deler kunne ikke genereres på grunn av en midlertidig serverfeil. Produktene i disse delene mangler nedenfor – prøv å kjøre igjen om en liten stund.",
         "all_failed_error": "❌ Kunne ikke generere noen tekster akkurat nå på grunn av en serverfeil. Prøv igjen om en liten stund.",
         "search_placeholder": "🔍 Søk etter et produkt ved navn...",
+        "tone_label": "🎨 Tone for de genererte tekstene",
         "warning_text": "⚠️ **Kontroller alltid tall og spesifikasjoner** (f.eks. batteritid, mål, ytelse) mot din egen produktdata før du publiserer tekstene.",
         "processing_batch": "*Behandler del {i} av {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken behandler ordene dine i skyen...*",
@@ -131,6 +133,7 @@ UI_TEXTS = {
         "batch_failure_warning": "⚠️ {failed} af {total} dele kunne ikke genereres på grund af en midlertidig serverfejl. Produkterne i disse dele mangler nedenfor – prøv at køre igen om lidt.",
         "all_failed_error": "❌ Kunne ikke generere nogen tekster lige nu på grund af en serverfejl. Prøv igen om lidt.",
         "search_placeholder": "🔍 Søg efter et produkt ved navn...",
+        "tone_label": "🎨 Tone for de genererede tekster",
         "warning_text": "⚠️ **Kontroller altid tal og specifikationer** (f.eks. batteritid, mål, ydeevne) mod dine egne produktdata, inden du publicerer teksterne.",
         "processing_batch": "*Behandler del {i} af {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken behandler dine ord i skyen...*",
@@ -174,6 +177,7 @@ UI_TEXTS = {
         "batch_failure_warning": "⚠️ {failed}/{total} osaa ei voitu luoda tilapäisen palvelinvirheen vuoksi. Näiden osien tuotteet puuttuvat alta – yritä ajaa uudelleen hetken kuluttua.",
         "all_failed_error": "❌ Tekstejä ei voitu luoda juuri nyt palvelinvirheen vuoksi. Yritä uudelleen hetken kuluttua.",
         "search_placeholder": "🔍 Hae tuotetta nimellä...",
+        "tone_label": "🎨 Tuotetekstien sävy",
         "warning_text": "⚠️ **Tarkista aina luvut ja spesifikaatiot** (esim. akun kesto, mitat, suorituskyky) omista tuotetiedoistasi ennen tekstien julkaisua.",
         "processing_batch": "*Käsitellään osaa {i}/{n} TextFabrikenin koneissa...*",
         "processing_single": "*TextFabriken käsittelee sanojasi pilvessä...*",
@@ -219,6 +223,7 @@ UI_TEXTS = {
         "batch_failure_warning": "⚠️ {failed} of {total} parts could not be generated due to a temporary server error. The products in those parts are missing below – try running it again shortly.",
         "all_failed_error": "❌ Could not generate any text right now due to a server error. Please try again shortly.",
         "search_placeholder": "🔍 Search for a product by name...",
+        "tone_label": "🎨 Tone for the generated texts",
         "warning_text": "⚠️ **Always verify figures and specifications** (e.g. battery life, dimensions, performance) against your own product data before publishing the texts.",
         "processing_batch": "*Processing part {i} of {n} in TextFabriken's machines...*",
         "processing_single": "*TextFabriken is processing your words in the cloud...*",
@@ -311,6 +316,52 @@ SEO_DIREKTIV = {
         "SEO TAGS: Add 5 relevant keywords for Google.\n"
         "Do not use any emojis or colored bullet points whatsoever. Print the texts directly one after another, separated by a dash (---) between each product."
     ),
+}
+
+# --- TONLÄGE/STIL FÖR DE GENERERADE TEXTERNA ---
+TONLAGE_ALTERNATIV = ["kaxig", "lyxig", "lekfull", "saklig"]  # interna nycklar (oberoende av gränssnittsspråk)
+
+TONLAGE_LABELS = {
+    "Svenska": {"kaxig": "Kaxig & modern (standard)", "lyxig": "Lyxig & exklusiv", "lekfull": "Lekfull & ungdomlig", "saklig": "Saklig & professionell"},
+    "Norsk":   {"kaxig": "Frekk & moderne (standard)", "lyxig": "Luksuriøs & eksklusiv", "lekfull": "Lekende & ungdommelig", "saklig": "Saklig & profesjonell"},
+    "Dansk":   {"kaxig": "Fræk & moderne (standard)", "lyxig": "Luksuriøs & eksklusiv", "lekfull": "Legende & ungdommelig", "saklig": "Saglig & professionel"},
+    "Suomi":   {"kaxig": "Rohkea & moderni (oletus)", "lyxig": "Ylellinen & eksklusiivinen", "lekfull": "Leikkisä & nuorekas", "saklig": "Asiallinen & ammattimainen"},
+    "English": {"kaxig": "Bold & modern (default)", "lyxig": "Luxurious & exclusive", "lekfull": "Playful & youthful", "saklig": "Factual & professional"},
+}
+
+# Extra instruktion som läggs till direktivet beroende på valt tonläge. "kaxig" lämnas tom eftersom
+# grunddirektivet redan skriver i en kaxig/säljande ton som standard.
+TONLAGE_INSTRUKTIONER = {
+    "Svenska": {
+        "kaxig": "",
+        "lyxig": "VIKTIGT: Skriv med en lyxig och exklusiv ton - som om produkten säljs i en premiumbutik. Använd sofistikerat, elegant språk och betona kvalitet, prestige och exklusivitet istället för kaxighet.",
+        "lekfull": "VIKTIGT: Skriv med en lekfull och ungdomlig ton - använd ett avslappnat, roligt och energiskt språk som tilltalar en yngre målgrupp, gärna med lite humor.",
+        "saklig": "VIKTIGT: Skriv med en saklig och professionell ton - undvik säljjargong och superlativ, fokusera istället på fakta, funktion och tydlig, korrekt information.",
+    },
+    "Norsk": {
+        "kaxig": "",
+        "lyxig": "VIKTIG: Skriv med en luksuriøs og eksklusiv tone - som om produktet selges i en premiumbutikk. Bruk sofistikert, elegant språk og fremhev kvalitet, prestisje og eksklusivitet fremfor frekkhet.",
+        "lekfull": "VIKTIG: Skriv med en lekende og ungdommelig tone - bruk et avslappet, morsomt og energisk språk som appellerer til et yngre publikum, gjerne med litt humor.",
+        "saklig": "VIKTIG: Skriv med en saklig og profesjonell tone - unngå salgssjargong og superlativer, fokuser i stedet på fakta, funksjon og tydelig, korrekt informasjon.",
+    },
+    "Dansk": {
+        "kaxig": "",
+        "lyxig": "VIGTIGT: Skriv med en luksuriøs og eksklusiv tone - som om produktet sælges i en premium-butik. Brug sofistikeret, elegant sprog og fremhæv kvalitet, prestige og eksklusivitet frem for fræk stil.",
+        "lekfull": "VIGTIGT: Skriv med en legende og ungdommelig tone - brug et afslappet, sjovt og energisk sprog, der appellerer til et yngre publikum, gerne med lidt humor.",
+        "saklig": "VIGTIGT: Skriv med en saglig og professionel tone - undgå salgsjargon og superlativer, fokuser i stedet på fakta, funktion og tydelig, korrekt information.",
+    },
+    "Suomi": {
+        "kaxig": "",
+        "lyxig": "TÄRKEÄÄ: Kirjoita ylellisellä ja eksklusiivisella sävyllä - ikään kuin tuotetta myytäisiin premium-liikkeessä. Käytä hienostunutta, tyylikästä kieltä ja korosta laatua, arvostusta ja eksklusiivisuutta rohkeuden sijaan.",
+        "lekfull": "TÄRKEÄÄ: Kirjoita leikkisällä ja nuorekkaalla sävyllä - käytä rentoa, hauskaa ja energistä kieltä, joka vetoaa nuorempaan yleisöön, mielellään pienellä huumorilla.",
+        "saklig": "TÄRKEÄÄ: Kirjoita asiallisella ja ammattimaisella sävyllä - vältä myyntijargonia ja superlatiiveja, keskity sen sijaan faktoihin, toimivuuteen ja selkeään, oikeaan tietoon.",
+    },
+    "English": {
+        "kaxig": "",
+        "lyxig": "IMPORTANT: Write with a luxurious and exclusive tone - as if the product were sold in a premium boutique. Use sophisticated, elegant language and emphasize quality, prestige, and exclusivity rather than boldness.",
+        "lekfull": "IMPORTANT: Write with a playful and youthful tone - use relaxed, fun, and energetic language that appeals to a younger audience, with a touch of humor.",
+        "saklig": "IMPORTANT: Write with a factual and professional tone - avoid sales jargon and superlatives, focus instead on facts, functionality, and clear, accurate information.",
+    },
 }
 
 # --- RUBRIKORD PER SPRÅK (används för att dela upp den genererade texten i kolumner vid CSV/Excel-export) ---
@@ -492,6 +543,7 @@ if "fil_bearbetad" not in st.session_state: st.session_state.fil_bearbetad = Fal
 if "senast_uppladdad_fil" not in st.session_state: st.session_state.senast_uppladdad_fil = None
 if "sprak" not in st.session_state: st.session_state.sprak = "Svenska"
 if "produkter" not in st.session_state: st.session_state.produkter = []
+if "tonlage" not in st.session_state: st.session_state.tonlage = "kaxig"
 
 t = UI_TEXTS[st.session_state.sprak]  # Genväg till aktuellt gränssnittsspråks texter
 
@@ -508,6 +560,13 @@ with st.sidebar:
     vald_sprak = st.selectbox(t["lang_label"], SPRAK_ALTERNATIV, index=SPRAK_ALTERNATIV.index(st.session_state.sprak))
     if vald_sprak != st.session_state.sprak:
         st.session_state.sprak = vald_sprak
+        st.rerun()
+
+    tonlage_etiketter = TONLAGE_LABELS[st.session_state.sprak]
+    vald_tonlage_etikett = st.selectbox(t["tone_label"], list(tonlage_etiketter.values()), index=TONLAGE_ALTERNATIV.index(st.session_state.tonlage))
+    vald_tonlage_nyckel = [k for k, v in tonlage_etiketter.items() if v == vald_tonlage_etikett][0]
+    if vald_tonlage_nyckel != st.session_state.tonlage:
+        st.session_state.tonlage = vald_tonlage_nyckel
         st.rerun()
 
     st.write("---")
@@ -624,6 +683,9 @@ def kor_massgenerering(extra_instruktion=""):
        Misslyckade batchar hålls ISÄR från lyckade svar - de blandas aldrig in som om de vore
        genererad produkttext, och användaren varnas tydligt om något gick fel."""
     direktiv = SEO_DIREKTIV[st.session_state.sprak]
+    tonlage_instruktion = TONLAGE_INSTRUKTIONER[st.session_state.sprak][st.session_state.tonlage]
+    if tonlage_instruktion:
+        direktiv = direktiv + " " + tonlage_instruktion
     progress_bar = st.progress(0)
     status_text = st.empty()
 
@@ -748,6 +810,9 @@ if st.session_state.show_download and st.session_state.generated_file_content:
                     if st.button(t["regenerate_button"], key=f"regen_{produkt['id']}", use_container_width=True):
                         with st.spinner(t["regenerating_text"]):
                             direktiv = SEO_DIREKTIV[st.session_state.sprak]
+                            tonlage_instruktion = TONLAGE_INSTRUKTIONER[st.session_state.sprak][st.session_state.tonlage]
+                            if tonlage_instruktion:
+                                direktiv = direktiv + " " + tonlage_instruktion
                             h = PRODUKT_RUBRIKER[st.session_state.sprak]
                             regen_prompt = (
                                 f"Skriv om EXAKT EN produkt, med samma produktnamn: \"{produkt['namn']}\". "
