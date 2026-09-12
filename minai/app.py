@@ -13,6 +13,32 @@ from openpyxl.styles import Font
 
 st.set_page_config(page_title="TextFabriken AI", page_icon="🏭", layout="centered", initial_sidebar_state="expanded")
 
+# --- ANPASSAD STYLING (rundare knappar, snyggare chattbubblor) ---
+st.markdown("""
+<style>
+.stButton button, .stDownloadButton button {
+    border-radius: 10px;
+    transition: transform 0.1s ease, filter 0.15s ease;
+}
+.stButton button:hover, .stDownloadButton button:hover {
+    filter: brightness(1.15);
+}
+.stButton button:active, .stDownloadButton button:active {
+    transform: scale(0.98);
+}
+button[kind="primary"] {
+    border-radius: 10px;
+    font-weight: 600;
+}
+[data-testid="stChatMessage"] {
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # --- SÄKRAD API-NYCKEL (Hämtas från ditt Streamlit-valv) ---
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 
@@ -701,7 +727,7 @@ with st.container():
         with col1:
             uploaded_file = st.file_uploader(t["uploader_label"], type=["pdf", "txt", "docx"], label_visibility="collapsed")
         with col2:
-            copy_klick = st.button(t["rocket_button"], use_container_width=True)
+            copy_klick = st.button(t["rocket_button"], use_container_width=True, type="primary")
 
 # Processa filen
 if uploaded_file is not None:
