@@ -668,7 +668,7 @@ with st.expander(t["howto_header"]):
 
 # --- SIDOMENY ---
 with st.sidebar:
-    st.markdown('<p style="font-size:20px;font-weight:600;margin:0 0 0.5rem;">Text<span style="color:#378add;">Fabriken</span> AI</p>', unsafe_allow_html=True)
+    st.markdown('<p style="font-size:28px;font-weight:600;margin:0 0 0.5rem;text-align:center;">Text<span style="color:#378add;">Fabriken</span> AI</p>', unsafe_allow_html=True)
     st.write("---")
 
     vald_sprak = st.selectbox(t["lang_label"], SPRAK_ALTERNATIV, index=SPRAK_ALTERNATIV.index(st.session_state.sprak))
