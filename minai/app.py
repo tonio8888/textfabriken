@@ -656,11 +656,11 @@ with open(AVATAR_PATH, "rb") as _f:
     _logo_b64 = base64.b64encode(_f.read()).decode()
 
 st.markdown(f"""
-<div style="display:flex;justify-content:center;padding:1rem 0 1.5rem;">
+<div style="display:flex;justify-content:center;padding:0 0 1rem;">
   <img src="data:image/png;base64,{_logo_b64}" width="64" height="64" style="border-radius:16px;" />
 </div>
 """, unsafe_allow_html=True)
-st.markdown(f'<h3 style="text-align:center;">{t["subheader"]}</h3>', unsafe_allow_html=True)
+st.markdown(f'<h3 style="text-align:center;margin-top:0;">{t["subheader"]}</h3>', unsafe_allow_html=True)
 st.write(t["intro"])
 
 with st.expander(t["howto_header"]):
