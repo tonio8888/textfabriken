@@ -44,6 +44,7 @@ UI_TEXTS = {
         "regenerating_text": "Regenererar produkten...",
         "batch_failure_warning": "⚠️ {failed} av {total} delar kunde inte genereras på grund av ett tillfälligt serverfel. Produkterna i dessa delar saknas nedan – testa att köra igen om en liten stund.",
         "all_failed_error": "❌ Kunde inte generera några texter just nu på grund av ett serverfel. Försök igen om en liten stund.",
+        "search_placeholder": "🔍 Sök efter en produkt på namn...",
         "warning_text": "⚠️ **Kontrollera alltid siffror och specifikationer** (t.ex. batteritid, mått, prestanda) mot din egen produktdata innan du publicerar texterna.",
         "processing_batch": "*Bearbetar del {i} av {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken bearbetar dina ord i molnet...*",
@@ -86,6 +87,7 @@ UI_TEXTS = {
         "regenerating_text": "Regenererer produktet...",
         "batch_failure_warning": "⚠️ {failed} av {total} deler kunne ikke genereres på grunn av en midlertidig serverfeil. Produktene i disse delene mangler nedenfor – prøv å kjøre igjen om en liten stund.",
         "all_failed_error": "❌ Kunne ikke generere noen tekster akkurat nå på grunn av en serverfeil. Prøv igjen om en liten stund.",
+        "search_placeholder": "🔍 Søk etter et produkt ved navn...",
         "warning_text": "⚠️ **Kontroller alltid tall og spesifikasjoner** (f.eks. batteritid, mål, ytelse) mot din egen produktdata før du publiserer tekstene.",
         "processing_batch": "*Behandler del {i} av {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken behandler ordene dine i skyen...*",
@@ -128,6 +130,7 @@ UI_TEXTS = {
         "regenerating_text": "Regenererer produktet...",
         "batch_failure_warning": "⚠️ {failed} af {total} dele kunne ikke genereres på grund af en midlertidig serverfejl. Produkterne i disse dele mangler nedenfor – prøv at køre igen om lidt.",
         "all_failed_error": "❌ Kunne ikke generere nogen tekster lige nu på grund af en serverfejl. Prøv igen om lidt.",
+        "search_placeholder": "🔍 Søg efter et produkt ved navn...",
         "warning_text": "⚠️ **Kontroller altid tal og specifikationer** (f.eks. batteritid, mål, ydeevne) mod dine egne produktdata, inden du publicerer teksterne.",
         "processing_batch": "*Behandler del {i} af {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken behandler dine ord i skyen...*",
@@ -170,6 +173,7 @@ UI_TEXTS = {
         "regenerating_text": "Luodaan tuotetta uudelleen...",
         "batch_failure_warning": "⚠️ {failed}/{total} osaa ei voitu luoda tilapäisen palvelinvirheen vuoksi. Näiden osien tuotteet puuttuvat alta – yritä ajaa uudelleen hetken kuluttua.",
         "all_failed_error": "❌ Tekstejä ei voitu luoda juuri nyt palvelinvirheen vuoksi. Yritä uudelleen hetken kuluttua.",
+        "search_placeholder": "🔍 Hae tuotetta nimellä...",
         "warning_text": "⚠️ **Tarkista aina luvut ja spesifikaatiot** (esim. akun kesto, mitat, suorituskyky) omista tuotetiedoistasi ennen tekstien julkaisua.",
         "processing_batch": "*Käsitellään osaa {i}/{n} TextFabrikenin koneissa...*",
         "processing_single": "*TextFabriken käsittelee sanojasi pilvessä...*",
@@ -214,6 +218,7 @@ UI_TEXTS = {
         "regenerating_text": "Regenerating the product...",
         "batch_failure_warning": "⚠️ {failed} of {total} parts could not be generated due to a temporary server error. The products in those parts are missing below – try running it again shortly.",
         "all_failed_error": "❌ Could not generate any text right now due to a server error. Please try again shortly.",
+        "search_placeholder": "🔍 Search for a product by name...",
         "warning_text": "⚠️ **Always verify figures and specifications** (e.g. battery life, dimensions, performance) against your own product data before publishing the texts.",
         "processing_batch": "*Processing part {i} of {n} in TextFabriken's machines...*",
         "processing_single": "*TextFabriken is processing your words in the cloud...*",
@@ -725,7 +730,13 @@ if st.session_state.show_download and st.session_state.generated_file_content:
         st.markdown(t["edit_products_header"])
         kolumner = EXPORT_KOLUMNER[st.session_state.sprak]
 
-        for produkt in list(st.session_state.produkter):
+        sokterm = st.text_input(t["search_placeholder"], value="", key="produkt_sokning", label_visibility="collapsed")
+        if sokterm.strip():
+            visade_produkter = [p for p in st.session_state.produkter if sokterm.strip().lower() in p["namn"].lower()]
+        else:
+            visade_produkter = list(st.session_state.produkter)
+
+        for produkt in visade_produkter:
             with st.expander(f"✏️ {produkt['namn']}"):
                 produkt["namn"] = st.text_input(kolumner[0], value=produkt["namn"], key=f"namn_{produkt['id']}")
                 produkt["beskrivning"] = st.text_area(kolumner[1], value=produkt["beskrivning"], key=f"besk_{produkt['id']}", height=120)
