@@ -51,8 +51,8 @@ SPRAK_ALTERNATIV = ["Svenska", "Norsk", "Dansk", "Suomi", "English"]
 
 UI_TEXTS = {
     "Svenska": {
-        "subheader": "Nordens smartaste löpande band for produktbeskrivningar",
-        "intro": "Förvandla produktdata till färdiga säljtexter",
+        "subheader": "Förvandla produktdata till färdiga säljtexter",
+        "intro": "",
         "lang_label": "🌐 Språk för texter och gränssnitt",
         "workspace_info": "🔑 Din arbetsyta-kod: **{kod}**\n\nSpara den här sidans webbadress (bokmärk fliken) för att komma tillbaka till dina sparade listor senare.",
         "saved_header": "📋 Sparade produktlistor",
