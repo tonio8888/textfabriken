@@ -266,12 +266,15 @@ if prompt:
                 "1) transformera en uppladdad produktlista (PDF/TXT/Word) till säljande SEO-texter, och "
                 "2) svara på allmänna frågor om copywriting, SEO eller produkttexter. "
                 "Du kan INTE hantera ordrar, kundkonton, betalningar, leveranser, returer eller lagerstatus – det är inte vad den här appen gör, och du ska aldrig hitta på att du kan det. "
-                "Du kan heller inte skapa nedladdningsbara filer i chatten – om användaren vill ladda ner sina genererade texter, säg åt dem att använda den blå 'Ladda ner produkttexter (.docx)'-knappen som visas automatiskt efter en massgenerering. "
+                "Om användaren vill ladda ner något du skrivit, säg åt dem att använda den blå 'Ladda ner produkttexter (.docx)'-knappen som automatiskt dyker upp under chatten efter varje svar du ger. "
                 "Om en fråga ligger utanför det du faktiskt kan göra, säg det ärligt istället för att gissa eller hitta på en lösning. Svara naturligt och hjälpsamt inom dessa gränser."
             )
             ai_svar = fraga_groq(system_d, prompt)
             message_placeholder.markdown(f"**TextFabriken:**\n\n{ai_svar}")
             st.session_state.messages.append({"role": "assistant", "content": ai_svar})
+            # Gör svaret nedladdningsbart som Word-fil, precis som vid massgenerering
+            st.session_state.generated_file_content = ai_svar
+            st.session_state.show_download = True
 
         if uploaded_file is not None:
             st.session_state.saved_sessions[st.session_state.current_session_name] = {"messages": st.session_state.messages, "file_content": st.session_state.generated_file_content, "show_download": st.session_state.show_download}
