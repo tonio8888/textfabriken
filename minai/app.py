@@ -52,7 +52,7 @@ SPRAK_ALTERNATIV = ["Svenska", "Norsk", "Dansk", "Suomi", "English"]
 UI_TEXTS = {
     "Svenska": {
         "subheader": "Förvandla produktdata till säljande texter",
-        "intro": "Ladda upp din rådata i bottenmenyn. TextFabriken transformerar den till säljande SEO-texter och skapar en färdig Word-fil åt dig!",
+        "intro": "Ladda upp din produktlista – få färdiga SEO-texter på sekunder.",
         "lang_label": "🌐 Språk för texter och gränssnitt",
         "workspace_info": "🔑 Din arbetsyta-kod: **{kod}**\n\nSpara den här sidans webbadress (bokmärk fliken) för att komma tillbaka till dina sparade listor senare.",
         "saved_header": "📋 Sparade produktlistor",
@@ -101,7 +101,7 @@ UI_TEXTS = {
     },
     "Norsk": {
         "subheader": "Forvandle produktdata til salgstekster",
-        "intro": "Last opp rådataene dine i menyen nederst. TextFabriken forvandler dem til salgsfremmende SEO-tekster og lager en ferdig Word-fil for deg!",
+        "intro": "Last opp produktlisten din – få ferdige SEO-tekster på sekunder.",
         "lang_label": "🌐 Språk for tekster og grensesnitt",
         "workspace_info": "🔑 Din arbeidsflate-kode: **{kod}**\n\nLagre nettadressen til denne siden (bokmerk fanen) for å komme tilbake til dine lagrede lister senere.",
         "saved_header": "📋 Lagrede produktlister",
@@ -150,7 +150,7 @@ UI_TEXTS = {
     },
     "Dansk": {
         "subheader": "Forvandl produktdata til salgsfremmende tekster",
-        "intro": "Upload dine rådata i menuen nedenfor. TextFabriken forvandler dem til salgsfremmende SEO-tekster og genererer en færdig Word-fil til dig!",
+        "intro": "Upload din produktliste – få færdige SEO-tekster på sekunder.",
         "lang_label": "🌐 Sprog til tekster og brugerflade",
         "workspace_info": "🔑 Din arbejdsområde-kode: **{kod}**\n\nGem denne sides webadresse (sæt bogmærke i fanen) for at komme tilbage til dine gemte lister senere.",
         "saved_header": "📋 Gemte produktlister",
@@ -199,7 +199,7 @@ UI_TEXTS = {
     },
     "Suomi": {
         "subheader": "Muuta tuotetiedot myyviksi teksteiksi",
-        "intro": "Lataa raakadatasi alavalikossa. TextFabriken muuttaa sen myyväksi SEO-tekstiksi ja luo sinulle valmiin Word-tiedoston!",
+        "intro": "Lataa tuotelistasi – saat valmiit SEO-tekstit sekunneissa.",
         "lang_label": "🌐 Tekstien ja käyttöliittymän kieli",
         "workspace_info": "🔑 Työtilasi koodi: **{kod}**\n\nTallenna tämän sivun verkko-osoite (lisää kirjanmerkki) päästäksesi takaisin tallennettuihin listoihisi myöhemmin.",
         "saved_header": "📋 Tallennetut tuotelistat",
@@ -250,7 +250,7 @@ UI_TEXTS = {
     },
     "English": {
         "subheader": "Turn product data into selling copy",
-        "intro": "Upload your raw data in the menu below. TextFabriken transforms it into compelling SEO copy and creates a ready-made Word file for you!",
+        "intro": "Upload your product list – get finished SEO copy in seconds.",
         "lang_label": "🌐 Language for texts and interface",
         "workspace_info": "🔑 Your workspace code: **{kod}**\n\nSave this page's URL (bookmark the tab) to return to your saved lists later.",
         "saved_header": "📋 Saved product lists",
