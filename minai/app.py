@@ -49,6 +49,8 @@ UI_TEXTS = {
         "platform_label": "🛒 Publiceringsmål (justerar teckengränser)",
         "char_count_warning": "⚠️ {field} är {count} tecken – överskrider {limit}-teckensgränsen för {platform}",
         "chat_as_product_checkbox": "📦 Behandla detta meddelande som produktdata (ger CSV/Excel-export)",
+        "howto_header": "❓ Hur funkar TextFabriken?",
+        "howto_steps": "**1. Ladda upp din produktlista** - PDF, TXT eller Word-fil med dina produkter (eller skriv direkt i chattrutan).\n\n**2. Ställ in dina val i sidomenyn** - språk, tonläge (kaxig/lyxig/lekfull/saklig) och om texten ska anpassas för en specifik plattform (t.ex. Amazon).\n\n**3. Klicka på raketknappen 🚀** - TextFabriken genererar säljande SEO-texter för alla dina produkter.\n\n**4. Redigera vid behov** - öppna en produkt i redigeringslistan för att ändra texten manuellt eller låta AI:n skriva om den.\n\n**5. Ladda ner** - välj Word, CSV eller Excel beroende på vad du ska göra med texterna.",
         "warning_text": "⚠️ **Kontrollera alltid siffror och specifikationer** (t.ex. batteritid, mått, prestanda) mot din egen produktdata innan du publicerar texterna.",
         "processing_batch": "*Bearbetar del {i} av {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken bearbetar dina ord i molnet...*",
@@ -96,6 +98,8 @@ UI_TEXTS = {
         "platform_label": "🛒 Publiseringsmål (justerer tegngrenser)",
         "char_count_warning": "⚠️ {field} er {count} tegn – overskrider grensen på {limit} tegn for {platform}",
         "chat_as_product_checkbox": "📦 Behandle denne meldingen som produktdata (gir CSV/Excel-eksport)",
+        "howto_header": "❓ Hvordan fungerer TextFabriken?",
+        "howto_steps": "**1. Last opp produktlisten din** - PDF, TXT eller Word-fil med produktene dine (eller skriv direkte i chatten).\n\n**2. Still inn valgene dine i sidemenyen** - språk, tone (frekk/luksuriøs/lekende/saklig) og om teksten skal tilpasses en bestemt plattform (f.eks. Amazon).\n\n**3. Klikk på rakettknappen 🚀** - TextFabriken genererer salgstekster for alle produktene dine.\n\n**4. Rediger ved behov** - åpne et produkt i redigeringslisten for å endre teksten manuelt eller la AI-en skrive den om.\n\n**5. Last ned** - velg Word, CSV eller Excel avhengig av hva du skal gjøre med tekstene.",
         "warning_text": "⚠️ **Kontroller alltid tall og spesifikasjoner** (f.eks. batteritid, mål, ytelse) mot din egen produktdata før du publiserer tekstene.",
         "processing_batch": "*Behandler del {i} av {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken behandler ordene dine i skyen...*",
@@ -143,6 +147,8 @@ UI_TEXTS = {
         "platform_label": "🛒 Udgivelsesmål (justerer tegngrænser)",
         "char_count_warning": "⚠️ {field} er {count} tegn – overskrider grænsen på {limit} tegn for {platform}",
         "chat_as_product_checkbox": "📦 Behandl denne besked som produktdata (giver CSV/Excel-eksport)",
+        "howto_header": "❓ Hvordan fungerer TextFabriken?",
+        "howto_steps": "**1. Upload din produktliste** - PDF, TXT eller Word-fil med dine produkter (eller skriv direkte i chatten).\n\n**2. Indstil dine valg i sidemenuen** - sprog, tone (fræk/luksuriøs/legende/saglig) og om teksten skal tilpasses en bestemt platform (f.eks. Amazon).\n\n**3. Klik på raketknappen 🚀** - TextFabriken genererer salgstekster til alle dine produkter.\n\n**4. Rediger efter behov** - åbn et produkt i redigeringslisten for at ændre teksten manuelt eller lade AI'en omskrive den.\n\n**5. Download** - vælg Word, CSV eller Excel afhængigt af, hvad du skal bruge teksterne til.",
         "warning_text": "⚠️ **Kontroller altid tal og specifikationer** (f.eks. batteritid, mål, ydeevne) mod dine egne produktdata, inden du publicerer teksterne.",
         "processing_batch": "*Behandler del {i} af {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken behandler dine ord i skyen...*",
@@ -190,6 +196,8 @@ UI_TEXTS = {
         "platform_label": "🛒 Julkaisukohde (mukauttaa merkkirajoja)",
         "char_count_warning": "⚠️ {field} on {count} merkkiä – ylittää alustan {platform} {limit} merkin rajan",
         "chat_as_product_checkbox": "📦 Käsittele tämä viesti tuotetietona (mahdollistaa CSV/Excel-viennin)",
+        "howto_header": "❓ Miten TextFabriken toimii?",
+        "howto_steps": "**1. Lataa tuotelistasi** - PDF-, TXT- tai Word-tiedosto tuotteistasi (tai kirjoita suoraan chattiin).\n\n**2. Aseta valintasi sivupalkissa** - kieli, sävy (rohkea/ylellinen/leikkisä/asiallinen) ja mahdollinen kohdealusta (esim. Amazon).\n\n**3. Klikkaa rakettipainiketta 🚀** - TextFabriken luo myyvät tekstit kaikille tuotteillesi.\n\n**4. Muokkaa tarvittaessa** - avaa tuote muokkauslistasta muuttaaksesi tekstiä manuaalisesti tai anna tekoälyn kirjoittaa se uudelleen.\n\n**5. Lataa** - valitse Word, CSV tai Excel sen mukaan, mihin aiot käyttää tekstejä.",
         "warning_text": "⚠️ **Tarkista aina luvut ja spesifikaatiot** (esim. akun kesto, mitat, suorituskyky) omista tuotetiedoistasi ennen tekstien julkaisua.",
         "processing_batch": "*Käsitellään osaa {i}/{n} TextFabrikenin koneissa...*",
         "processing_single": "*TextFabriken käsittelee sanojasi pilvessä...*",
@@ -239,6 +247,8 @@ UI_TEXTS = {
         "platform_label": "🛒 Publish target (adjusts character limits)",
         "char_count_warning": "⚠️ {field} is {count} characters – exceeds the {limit}-character limit for {platform}",
         "chat_as_product_checkbox": "📦 Treat this message as product data (enables CSV/Excel export)",
+        "howto_header": "❓ How does TextFabriken work?",
+        "howto_steps": "**1. Upload your product list** - a PDF, TXT, or Word file with your products (or type directly in the chat).\n\n**2. Set your options in the sidebar** - language, tone (bold/luxurious/playful/factual), and whether the text should be adapted for a specific platform (e.g. Amazon).\n\n**3. Click the rocket button 🚀** - TextFabriken generates selling SEO copy for all your products.\n\n**4. Edit as needed** - open a product in the edit list to change the text manually or have the AI rewrite it.\n\n**5. Download** - choose Word, CSV, or Excel depending on what you'll do with the texts.",
         "warning_text": "⚠️ **Always verify figures and specifications** (e.g. battery life, dimensions, performance) against your own product data before publishing the texts.",
         "processing_batch": "*Processing part {i} of {n} in TextFabriken's machines...*",
         "processing_single": "*TextFabriken is processing your words in the cloud...*",
@@ -613,6 +623,9 @@ t = UI_TEXTS[st.session_state.sprak]  # Genväg till aktuellt gränssnittsspråk
 st.title("🏭 TEXTFABRIKEN AI")
 st.subheader(t["subheader"])
 st.write(t["intro"])
+
+with st.expander(t["howto_header"]):
+    st.markdown(t["howto_steps"])
 
 # --- SIDOMENY ---
 with st.sidebar:
