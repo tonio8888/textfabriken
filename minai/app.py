@@ -4,9 +4,12 @@ import time
 import sqlite3
 import json
 import uuid
+import csv
 from pypdf import PdfReader
 import io
 from docx import Document
+from openpyxl import Workbook
+from openpyxl.styles import Font
 
 st.set_page_config(page_title="TextFabriken AI", page_icon="🏭", layout="centered", initial_sidebar_state="expanded")
 
@@ -33,6 +36,8 @@ UI_TEXTS = {
         "download_header": "### 📥 Din färdiga Word-fil från TextFabriken är klar!",
         "download_info": "💡 Innan du publicerar: dubbelkolla alla siffror (mått, kapacitet, batteritid, dB-nivåer m.m.) mot leverantörens originaldata. TextFabriken skriver säljande texter, men ansvarar inte för att specifikationerna är korrekta.",
         "download_button": "📝 Ladda ner produkttexter (.docx)",
+        "download_button_csv": "📊 Ladda ner som CSV (.csv)",
+        "download_button_xlsx": "📊 Ladda ner som Excel (.xlsx)",
         "warning_text": "⚠️ **Kontrollera alltid siffror och specifikationer** (t.ex. batteritid, mått, prestanda) mot din egen produktdata innan du publicerar texterna.",
         "processing_batch": "*Bearbetar del {i} av {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken bearbetar dina ord i molnet...*",
@@ -67,6 +72,8 @@ UI_TEXTS = {
         "download_header": "### 📥 Din ferdige Word-fil fra TextFabriken er klar!",
         "download_info": "💡 Før du publiserer: dobbeltsjekk alle tall (mål, kapasitet, batteritid, dB-nivåer osv.) mot leverandørens originaldata. TextFabriken skriver salgstekster, men er ikke ansvarlig for at spesifikasjonene er korrekte.",
         "download_button": "📝 Last ned produkttekster (.docx)",
+        "download_button_csv": "📊 Last ned som CSV (.csv)",
+        "download_button_xlsx": "📊 Last ned som Excel (.xlsx)",
         "warning_text": "⚠️ **Kontroller alltid tall og spesifikasjoner** (f.eks. batteritid, mål, ytelse) mot din egen produktdata før du publiserer tekstene.",
         "processing_batch": "*Behandler del {i} av {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken behandler ordene dine i skyen...*",
@@ -101,6 +108,8 @@ UI_TEXTS = {
         "download_header": "### 📥 Din færdige Word-fil fra TextFabriken er klar!",
         "download_info": "💡 Inden du publicerer: dobbelttjek alle tal (mål, kapacitet, batteritid, dB-niveauer m.m.) mod leverandørens originaldata. TextFabriken skriver salgsfremmende tekster, men er ikke ansvarlig for at specifikationerne er korrekte.",
         "download_button": "📝 Download produkttekster (.docx)",
+        "download_button_csv": "📊 Download som CSV (.csv)",
+        "download_button_xlsx": "📊 Download som Excel (.xlsx)",
         "warning_text": "⚠️ **Kontroller altid tal og specifikationer** (f.eks. batteritid, mål, ydeevne) mod dine egne produktdata, inden du publicerer teksterne.",
         "processing_batch": "*Behandler del {i} af {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken behandler dine ord i skyen...*",
@@ -135,6 +144,8 @@ UI_TEXTS = {
         "download_header": "### 📥 Valmis Word-tiedostosi TextFabrikenilta on nyt valmis!",
         "download_info": "💡 Ennen julkaisua: tarkista aina kaikki luvut (mitat, kapasiteetti, akun kesto, dB-tasot jne.) valmistajan alkuperäisistä tiedoista. TextFabriken kirjoittaa myyviä tekstejä, mutta ei vastaa spesifikaatioiden oikeellisuudesta.",
         "download_button": "📝 Lataa tuotetekstit (.docx)",
+        "download_button_csv": "📊 Lataa CSV-tiedostona (.csv)",
+        "download_button_xlsx": "📊 Lataa Excel-tiedostona (.xlsx)",
         "warning_text": "⚠️ **Tarkista aina luvut ja spesifikaatiot** (esim. akun kesto, mitat, suorituskyky) omista tuotetiedoistasi ennen tekstien julkaisua.",
         "processing_batch": "*Käsitellään osaa {i}/{n} TextFabrikenin koneissa...*",
         "processing_single": "*TextFabriken käsittelee sanojasi pilvessä...*",
@@ -171,6 +182,8 @@ UI_TEXTS = {
         "download_header": "### 📥 Your finished Word file from TextFabriken is ready!",
         "download_info": "💡 Before publishing: double-check all figures (dimensions, capacity, battery life, dB levels, etc.) against the manufacturer's original data. TextFabriken writes compelling copy, but is not responsible for the accuracy of the specifications.",
         "download_button": "📝 Download product texts (.docx)",
+        "download_button_csv": "📊 Download as CSV (.csv)",
+        "download_button_xlsx": "📊 Download as Excel (.xlsx)",
         "warning_text": "⚠️ **Always verify figures and specifications** (e.g. battery life, dimensions, performance) against your own product data before publishing the texts.",
         "processing_batch": "*Processing part {i} of {n} in TextFabriken's machines...*",
         "processing_single": "*TextFabriken is processing your words in the cloud...*",
@@ -264,6 +277,84 @@ SEO_DIREKTIV = {
         "Do not use any emojis or colored bullet points whatsoever. Print the texts directly one after another, separated by a dash (---) between each product."
     ),
 }
+
+# --- RUBRIKORD PER SPRÅK (används för att dela upp den genererade texten i kolumner vid CSV/Excel-export) ---
+PRODUKT_RUBRIKER = {
+    "Svenska": {"desc": "SÄLJANDE BESKRIVNING:", "fordelar": "NYCKELFÖRDELAR:", "taggar": "SEO-TAGGAR:"},
+    "Norsk":   {"desc": "SALGSBESKRIVELSE:", "fordelar": "NØKKELFORDELER:", "taggar": "SEO-STIKKORD:"},
+    "Dansk":   {"desc": "SALGSBESKRIVELSE:", "fordelar": "NØGLEFORDELE:", "taggar": "SEO-TAGS:"},
+    "Suomi":   {"desc": "MYYVÄ KUVAUS:", "fordelar": "AVAINEDUT:", "taggar": "SEO-AVAINSANAT:"},
+    "English": {"desc": "SELLING DESCRIPTION:", "fordelar": "KEY BENEFITS:", "taggar": "SEO TAGS:"},
+}
+
+# Kolumnrubriker för CSV/Excel-exporten, per språk
+EXPORT_KOLUMNER = {
+    "Svenska": ["Produktnamn", "Säljande beskrivning", "Nyckelfördelar", "SEO-taggar"],
+    "Norsk":   ["Produktnavn", "Salgsbeskrivelse", "Nøkkelfordeler", "SEO-stikkord"],
+    "Dansk":   ["Produktnavn", "Salgsbeskrivelse", "Nøglefordele", "SEO-tags"],
+    "Suomi":   ["Tuotenimi", "Myyvä kuvaus", "Avainedut", "SEO-avainsanat"],
+    "English": ["Product name", "Selling description", "Key benefits", "SEO tags"],
+}
+
+def parsa_produkter(text, sprak):
+    """Delar upp den genererade produkttexten i strukturerade rader (namn/beskrivning/fördelar/taggar)
+       baserat på rubrikorden för det aktuella språket. Block som saknar en giltig beskrivningsrubrik
+       (t.ex. varningstexten på slutet) hoppas över."""
+    h = PRODUKT_RUBRIKER[sprak]
+    block_lista = [b.strip() for b in text.split("---") if b.strip()]
+    produkter = []
+    for block in block_lista:
+        if h["desc"] not in block:
+            continue
+        rader = [r for r in block.splitlines() if r.strip() != ""]
+        namn = rader[0].strip().strip("*").strip() if rader else ""
+
+        def extrahera(start_etikett, slut_etiketter):
+            start_idx = block.find(start_etikett)
+            if start_idx == -1:
+                return ""
+            start_pos = start_idx + len(start_etikett)
+            slut_pos = len(block)
+            for slut_etikett in slut_etiketter:
+                p = block.find(slut_etikett, start_pos)
+                if p != -1 and p < slut_pos:
+                    slut_pos = p
+            return block[start_pos:slut_pos].strip(" \n-*")
+
+        beskrivning = extrahera(h["desc"], [h["fordelar"], h["taggar"]])
+        fordelar = extrahera(h["fordelar"], [h["taggar"]])
+        taggar = extrahera(h["taggar"], [])
+        produkter.append([namn, beskrivning, fordelar, taggar])
+    return produkter
+
+def skapa_csv(produkter, kolumner):
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(kolumner)
+    for rad in produkter:
+        writer.writerow(rad)
+    # utf-8-sig (BOM) så att Excel läser nordiska tecken (å,ä,ö,ø,æ) korrekt vid dubbelklick
+    return output.getvalue().encode("utf-8-sig")
+
+def skapa_xlsx(produkter, kolumner):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Produkter"
+    fet_stil = Font(name="Arial", bold=True)
+    normal_stil = Font(name="Arial")
+    for col_idx, rubrik in enumerate(kolumner, start=1):
+        cell = ws.cell(row=1, column=col_idx, value=rubrik)
+        cell.font = fet_stil
+    for rad_idx, rad in enumerate(produkter, start=2):
+        for col_idx, varde in enumerate(rad, start=1):
+            cell = ws.cell(row=rad_idx, column=col_idx, value=varde)
+            cell.font = normal_stil
+    bredder = [25, 60, 40, 35]
+    for i, bredd in enumerate(bredder, start=1):
+        ws.column_dimensions[ws.cell(row=1, column=i).column_letter].width = bredd
+    bio = io.BytesIO()
+    wb.save(bio)
+    return bio.getvalue()
 
 # --- DATABAS FÖR PERMANENT LAGRING AV SPARADE PRODUKTLISTOR (uppdelat per kund) ---
 DB_FIL = "textfabriken.db"
@@ -553,15 +644,31 @@ if prompt:
             db_spara_session(st.session_state.kund_id, st.session_state.current_session_name, st.session_state.messages, st.session_state.generated_file_content, st.session_state.show_download)
         st.rerun()
 
-# VISA WORD-KNAPP
+# VISA NEDLADDNINGSKNAPPAR (Word, CSV, Excel)
 if st.session_state.show_download and st.session_state.generated_file_content:
     st.write("---")
     st.markdown(t["download_header"])
     st.info(t["download_info"])
-    doc = Document()
-    doc.add_heading(t["doc_heading"], level=1)
     rensad_text = st.session_state.generated_file_content.replace(f"**{t['assistant_label']}:**\n\n", "")
-    for rad in rensad_text.split('\n'): doc.add_paragraph(rad)
-    bio = io.BytesIO()
-    doc.save(bio)
-    st.download_button(label=t["download_button"], data=bio.getvalue(), file_name="textfabriken_produkter.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+
+    col_word, col_csv, col_xlsx = st.columns(3)
+
+    with col_word:
+        doc = Document()
+        doc.add_heading(t["doc_heading"], level=1)
+        for rad in rensad_text.split('\n'): doc.add_paragraph(rad)
+        bio_docx = io.BytesIO()
+        doc.save(bio_docx)
+        st.download_button(label=t["download_button"], data=bio_docx.getvalue(), file_name="textfabriken_produkter.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document", use_container_width=True)
+
+    produkter = parsa_produkter(rensad_text, st.session_state.sprak)
+    kolumner = EXPORT_KOLUMNER[st.session_state.sprak]
+
+    if produkter:
+        with col_csv:
+            csv_data = skapa_csv(produkter, kolumner)
+            st.download_button(label=t["download_button_csv"], data=csv_data, file_name="textfabriken_produkter.csv", mime="text/csv", use_container_width=True)
+
+        with col_xlsx:
+            xlsx_data = skapa_xlsx(produkter, kolumner)
+            st.download_button(label=t["download_button_xlsx"], data=xlsx_data, file_name="textfabriken_produkter.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True)
