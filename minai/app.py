@@ -46,6 +46,8 @@ UI_TEXTS = {
         "all_failed_error": "❌ Kunde inte generera några texter just nu på grund av ett serverfel. Försök igen om en liten stund.",
         "search_placeholder": "🔍 Sök efter en produkt på namn...",
         "tone_label": "🎨 Tonläge för de genererade texterna",
+        "platform_label": "🛒 Publiceringsmål (justerar teckengränser)",
+        "char_count_warning": "⚠️ {field} är {count} tecken – överskrider {limit}-teckensgränsen för {platform}",
         "warning_text": "⚠️ **Kontrollera alltid siffror och specifikationer** (t.ex. batteritid, mått, prestanda) mot din egen produktdata innan du publicerar texterna.",
         "processing_batch": "*Bearbetar del {i} av {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken bearbetar dina ord i molnet...*",
@@ -90,6 +92,8 @@ UI_TEXTS = {
         "all_failed_error": "❌ Kunne ikke generere noen tekster akkurat nå på grunn av en serverfeil. Prøv igjen om en liten stund.",
         "search_placeholder": "🔍 Søk etter et produkt ved navn...",
         "tone_label": "🎨 Tone for de genererte tekstene",
+        "platform_label": "🛒 Publiseringsmål (justerer tegngrenser)",
+        "char_count_warning": "⚠️ {field} er {count} tegn – overskrider grensen på {limit} tegn for {platform}",
         "warning_text": "⚠️ **Kontroller alltid tall og spesifikasjoner** (f.eks. batteritid, mål, ytelse) mot din egen produktdata før du publiserer tekstene.",
         "processing_batch": "*Behandler del {i} av {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken behandler ordene dine i skyen...*",
@@ -134,6 +138,8 @@ UI_TEXTS = {
         "all_failed_error": "❌ Kunne ikke generere nogen tekster lige nu på grund af en serverfejl. Prøv igen om lidt.",
         "search_placeholder": "🔍 Søg efter et produkt ved navn...",
         "tone_label": "🎨 Tone for de genererede tekster",
+        "platform_label": "🛒 Udgivelsesmål (justerer tegngrænser)",
+        "char_count_warning": "⚠️ {field} er {count} tegn – overskrider grænsen på {limit} tegn for {platform}",
         "warning_text": "⚠️ **Kontroller altid tal og specifikationer** (f.eks. batteritid, mål, ydeevne) mod dine egne produktdata, inden du publicerer teksterne.",
         "processing_batch": "*Behandler del {i} af {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken behandler dine ord i skyen...*",
@@ -178,6 +184,8 @@ UI_TEXTS = {
         "all_failed_error": "❌ Tekstejä ei voitu luoda juuri nyt palvelinvirheen vuoksi. Yritä uudelleen hetken kuluttua.",
         "search_placeholder": "🔍 Hae tuotetta nimellä...",
         "tone_label": "🎨 Tuotetekstien sävy",
+        "platform_label": "🛒 Julkaisukohde (mukauttaa merkkirajoja)",
+        "char_count_warning": "⚠️ {field} on {count} merkkiä – ylittää alustan {platform} {limit} merkin rajan",
         "warning_text": "⚠️ **Tarkista aina luvut ja spesifikaatiot** (esim. akun kesto, mitat, suorituskyky) omista tuotetiedoistasi ennen tekstien julkaisua.",
         "processing_batch": "*Käsitellään osaa {i}/{n} TextFabrikenin koneissa...*",
         "processing_single": "*TextFabriken käsittelee sanojasi pilvessä...*",
@@ -224,6 +232,8 @@ UI_TEXTS = {
         "all_failed_error": "❌ Could not generate any text right now due to a server error. Please try again shortly.",
         "search_placeholder": "🔍 Search for a product by name...",
         "tone_label": "🎨 Tone for the generated texts",
+        "platform_label": "🛒 Publish target (adjusts character limits)",
+        "char_count_warning": "⚠️ {field} is {count} characters – exceeds the {limit}-character limit for {platform}",
         "warning_text": "⚠️ **Always verify figures and specifications** (e.g. battery life, dimensions, performance) against your own product data before publishing the texts.",
         "processing_batch": "*Processing part {i} of {n} in TextFabriken's machines...*",
         "processing_single": "*TextFabriken is processing your words in the cloud...*",
@@ -365,6 +375,52 @@ TONLAGE_INSTRUKTIONER = {
 }
 
 # --- RUBRIKORD PER SPRÅK (används för att dela upp den genererade texten i kolumner vid CSV/Excel-export) ---
+# --- TECKENGRÄNSER PER PUBLICERINGSPLATTFORM ---
+PLATTFORM_ALTERNATIV = ["ingen", "google_shopping", "amazon"]  # interna nycklar
+
+PLATTFORM_LABELS = {
+    "Svenska": {"ingen": "Ingen specifik plattform (standard)", "google_shopping": "Google Shopping", "amazon": "Amazon"},
+    "Norsk":   {"ingen": "Ingen bestemt plattform (standard)", "google_shopping": "Google Shopping", "amazon": "Amazon"},
+    "Dansk":   {"ingen": "Ingen bestemt platform (standard)", "google_shopping": "Google Shopping", "amazon": "Amazon"},
+    "Suomi":   {"ingen": "Ei tiettyä alustaa (oletus)", "google_shopping": "Google Shopping", "amazon": "Amazon"},
+    "English": {"ingen": "No specific platform (default)", "google_shopping": "Google Shopping", "amazon": "Amazon"},
+}
+
+# Faktiska teckengränser (används för att visa varningar i redigeringsvyn) - se kommentar per plattform för källa
+PLATTFORM_GRANSER = {
+    "ingen": {"namn": None, "beskrivning": None, "fordel": None},
+    "google_shopping": {"namn": 150, "beskrivning": 1000, "fordel": None},  # Titel max 150 tecken; ~1000 första tecknen av beskrivningen är det som räknas
+    "amazon": {"namn": 200, "beskrivning": None, "fordel": 200},  # Titel max ~200 tecken; varje bullet point/nyckelfördel max ~200 tecken
+}
+
+PLATTFORM_INSTRUKTIONER = {
+    "Svenska": {
+        "ingen": "",
+        "google_shopping": "VIKTIGT: Texten ska publiceras på Google Shopping. Håll produktnamnet under 150 tecken och den säljande beskrivningen under 1000 tecken, annars riskerar den att klippas av.",
+        "amazon": "VIKTIGT: Texten ska publiceras på Amazon. Håll produktnamnet under 200 tecken och varje enskild nyckelfördel (punkt) under 200 tecken.",
+    },
+    "Norsk": {
+        "ingen": "",
+        "google_shopping": "VIKTIG: Teksten skal publiseres på Google Shopping. Hold produktnavnet under 150 tegn og salgsbeskrivelsen under 1000 tegn, ellers risikerer den å bli kuttet av.",
+        "amazon": "VIKTIG: Teksten skal publiseres på Amazon. Hold produktnavnet under 200 tegn og hvert enkelt nøkkelfortrinn (punkt) under 200 tegn.",
+    },
+    "Dansk": {
+        "ingen": "",
+        "google_shopping": "VIGTIGT: Teksten skal offentliggøres på Google Shopping. Hold produktnavnet under 150 tegn og salgsbeskrivelsen under 1000 tegn, ellers risikerer den at blive skåret af.",
+        "amazon": "VIGTIGT: Teksten skal offentliggøres på Amazon. Hold produktnavnet under 200 tegn og hvert enkelt nøglefordel-punkt under 200 tegn.",
+    },
+    "Suomi": {
+        "ingen": "",
+        "google_shopping": "TÄRKEÄÄ: Teksti julkaistaan Google Shopping -palvelussa. Pidä tuotenimi alle 150 merkin ja myyvä kuvaus alle 1000 merkin pituisena, muuten se saattaa katketa kesken.",
+        "amazon": "TÄRKEÄÄ: Teksti julkaistaan Amazonissa. Pidä tuotenimi alle 200 merkin ja jokainen yksittäinen avainetu (luettelokohta) alle 200 merkin pituisena.",
+    },
+    "English": {
+        "ingen": "",
+        "google_shopping": "IMPORTANT: This text will be published on Google Shopping. Keep the product name under 150 characters and the selling description under 1000 characters, or it risks being cut off.",
+        "amazon": "IMPORTANT: This text will be published on Amazon. Keep the product name under 200 characters and each individual key benefit (bullet point) under 200 characters.",
+    },
+}
+
 PRODUKT_RUBRIKER = {
     "Svenska": {"desc": "SÄLJANDE BESKRIVNING:", "fordelar": "NYCKELFÖRDELAR:", "taggar": "SEO-TAGGAR:"},
     "Norsk":   {"desc": "SALGSBESKRIVELSE:", "fordelar": "NØKKELFORDELER:", "taggar": "SEO-STIKKORD:"},
@@ -544,6 +600,7 @@ if "senast_uppladdad_fil" not in st.session_state: st.session_state.senast_uppla
 if "sprak" not in st.session_state: st.session_state.sprak = "Svenska"
 if "produkter" not in st.session_state: st.session_state.produkter = []
 if "tonlage" not in st.session_state: st.session_state.tonlage = "kaxig"
+if "plattform" not in st.session_state: st.session_state.plattform = "ingen"
 
 t = UI_TEXTS[st.session_state.sprak]  # Genväg till aktuellt gränssnittsspråks texter
 
@@ -567,6 +624,13 @@ with st.sidebar:
     vald_tonlage_nyckel = [k for k, v in tonlage_etiketter.items() if v == vald_tonlage_etikett][0]
     if vald_tonlage_nyckel != st.session_state.tonlage:
         st.session_state.tonlage = vald_tonlage_nyckel
+        st.rerun()
+
+    plattform_etiketter = PLATTFORM_LABELS[st.session_state.sprak]
+    vald_plattform_etikett = st.selectbox(t["platform_label"], list(plattform_etiketter.values()), index=PLATTFORM_ALTERNATIV.index(st.session_state.plattform))
+    vald_plattform_nyckel = [k for k, v in plattform_etiketter.items() if v == vald_plattform_etikett][0]
+    if vald_plattform_nyckel != st.session_state.plattform:
+        st.session_state.plattform = vald_plattform_nyckel
         st.rerun()
 
     st.write("---")
@@ -686,6 +750,9 @@ def kor_massgenerering(extra_instruktion=""):
     tonlage_instruktion = TONLAGE_INSTRUKTIONER[st.session_state.sprak][st.session_state.tonlage]
     if tonlage_instruktion:
         direktiv = direktiv + " " + tonlage_instruktion
+    plattform_instruktion = PLATTFORM_INSTRUKTIONER[st.session_state.sprak][st.session_state.plattform]
+    if plattform_instruktion:
+        direktiv = direktiv + " " + plattform_instruktion
     progress_bar = st.progress(0)
     status_text = st.empty()
 
@@ -805,6 +872,15 @@ if st.session_state.show_download and st.session_state.generated_file_content:
                 produkt["fordelar"] = st.text_area(kolumner[2], value=produkt["fordelar"], key=f"ford_{produkt['id']}", height=100)
                 produkt["taggar"] = st.text_input(kolumner[3], value=produkt["taggar"], key=f"tag_{produkt['id']}")
 
+                granser = PLATTFORM_GRANSER[st.session_state.plattform]
+                plattform_visningsnamn = PLATTFORM_LABELS[st.session_state.sprak][st.session_state.plattform]
+                if granser["namn"] and len(produkt["namn"]) > granser["namn"]:
+                    st.caption(t["char_count_warning"].format(field=kolumner[0], count=len(produkt["namn"]), limit=granser["namn"], platform=plattform_visningsnamn))
+                if granser["beskrivning"] and len(produkt["beskrivning"]) > granser["beskrivning"]:
+                    st.caption(t["char_count_warning"].format(field=kolumner[1], count=len(produkt["beskrivning"]), limit=granser["beskrivning"], platform=plattform_visningsnamn))
+                if granser["fordel"] and any(len(rad) > granser["fordel"] for rad in produkt["fordelar"].split("\n") if rad.strip()):
+                    st.caption(t["char_count_warning"].format(field=kolumner[2], count=max(len(r) for r in produkt["fordelar"].split("\n")), limit=granser["fordel"], platform=plattform_visningsnamn))
+
                 col_regen, col_del = st.columns(2)
                 with col_regen:
                     if st.button(t["regenerate_button"], key=f"regen_{produkt['id']}", use_container_width=True):
@@ -813,6 +889,9 @@ if st.session_state.show_download and st.session_state.generated_file_content:
                             tonlage_instruktion = TONLAGE_INSTRUKTIONER[st.session_state.sprak][st.session_state.tonlage]
                             if tonlage_instruktion:
                                 direktiv = direktiv + " " + tonlage_instruktion
+                            plattform_instruktion = PLATTFORM_INSTRUKTIONER[st.session_state.sprak][st.session_state.plattform]
+                            if plattform_instruktion:
+                                direktiv = direktiv + " " + plattform_instruktion
                             h = PRODUKT_RUBRIKER[st.session_state.sprak]
                             regen_prompt = (
                                 f"Skriv om EXAKT EN produkt, med samma produktnamn: \"{produkt['namn']}\". "
