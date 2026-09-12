@@ -13,7 +13,7 @@ st.set_page_config(page_title="TextFabriken AI", page_icon="🏭", layout="cente
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 
 # --- SPRÅKINSTÄLLNINGAR ---
-SPRAK_ALTERNATIV = ["Svenska", "Norska", "Danska", "Finska", "Engelska"]
+SPRAK_ALTERNATIV = ["Svenska", "Norsk", "Dansk", "Suomi", "English"]
 
 UI_TEXTS = {
     "Svenska": {
@@ -49,7 +49,7 @@ UI_TEXTS = {
             "Om en fråga ligger utanför det du faktiskt kan göra, säg det ärligt istället för att gissa eller hitta på en lösning. Svara naturligt och hjälpsamt inom dessa gränser."
         ),
     },
-    "Norska": {
+    "Norsk": {
         "subheader": "Nordens smarteste samlebånd for produktbeskrivelser",
         "intro": "Last opp rådataene dine i menyen nederst. TextFabriken forvandler dem til salgsfremmende SEO-tekster og lager en ferdig Word-fil for deg!",
         "lang_label": "🌐 Språk for tekster og grensesnitt",
@@ -82,7 +82,7 @@ UI_TEXTS = {
             "Hvis et spørsmål ligger utenfor det du faktisk kan gjøre, si det ærlig i stedet for å gjette eller finne på en løsning. Svar naturlig og hjelpsomt innenfor disse grensene."
         ),
     },
-    "Danska": {
+    "Dansk": {
         "subheader": "Nordens smarteste samlebånd til produktbeskrivelser",
         "intro": "Upload dine rådata i menuen nedenfor. TextFabriken forvandler dem til salgsfremmende SEO-tekster og genererer en færdig Word-fil til dig!",
         "lang_label": "🌐 Sprog til tekster og brugerflade",
@@ -115,7 +115,7 @@ UI_TEXTS = {
             "Hvis et spørgsmål ligger uden for det, du faktisk kan gøre, så sig det ærligt i stedet for at gætte eller finde på en løsning. Svar naturligt og hjælpsomt inden for disse grænser."
         ),
     },
-    "Finska": {
+    "Suomi": {
         "subheader": "Pohjolan fiksuin tuotantolinja tuotekuvauksille",
         "intro": "Lataa raakadatasi alavalikossa. TextFabriken muuttaa sen myyväksi SEO-tekstiksi ja luo sinulle valmiin Word-tiedoston!",
         "lang_label": "🌐 Tekstien ja käyttöliittymän kieli",
@@ -150,7 +150,7 @@ UI_TEXTS = {
             "Jos kysymys on jotain, mitä et oikeasti osaa tehdä, kerro se rehellisesti sen sijaan, että arvailisit tai keksisit ratkaisun. Vastaa luonnollisesti ja avuliaasti näiden rajojen sisällä."
         ),
     },
-    "Engelska": {
+    "English": {
         "subheader": "The Nordics' smartest assembly line for product descriptions",
         "intro": "Upload your raw data in the menu below. TextFabriken transforms it into compelling SEO copy and creates a ready-made Word file for you!",
         "lang_label": "🌐 Language for texts and interface",
@@ -200,7 +200,7 @@ SEO_DIREKTIV = {
         "SEO-TAGGAR: Lägg till 5 relevanta sökord för Google.\n"
         "Använd absolut inga emojier eller färgade prickar. Skriv ut texterna direkt efter varandra, separation med ett streck (---) mellan varje produkt."
     ),
-    "Norska": (
+    "Norsk": (
         "Du er TextFabriken, en absolutt verdensmester innen e-handel, digital markedsføring og SEO-copywriting for det nordiske markedet. "
         "Skriv ALLTID på norsk (bokmål). "
         "Du har fått en fil med rådata eller en liste over produkter. Din oppgave er å omdanne denne listen til superselgende, frekke og moderne produktbeskrivelser på norsk. "
@@ -214,7 +214,7 @@ SEO_DIREKTIV = {
         "SEO-STIKKORD: Legg til 5 relevante søkeord for Google.\n"
         "Bruk absolutt ingen emojier eller fargede prikker. Skriv ut tekstene rett etter hverandre, separert med en strek (---) mellom hvert produkt."
     ),
-    "Danska": (
+    "Dansk": (
         "Du er TextFabriken, en absolut verdensmester inden for e-handel, digital markedsføring og SEO-copywriting til det nordiske marked. "
         "Skriv ALTID på dansk. "
         "Du har fået en fil med rådata eller en liste over produkter. Din opgave er at omdanne denne liste til superoverbevisende, freaky og moderne produktbeskrivelser på dansk. "
@@ -228,7 +228,7 @@ SEO_DIREKTIV = {
         "SEO-TAGS: Tilføj 5 relevante søgeord til Google.\n"
         "Brug absolut ingen emojis eller farvede prikker. Skriv teksterne direkte efter hinanden, adskilt med en streg (---) mellem hvert produkt."
     ),
-    "Finska": (
+    "Suomi": (
         "CRITICAL RULE: You must write ONLY in Finnish (suomi). NEVER write in Swedish, Danish, Norwegian, or English. This rule overrides everything else. "
         "Olet TextFabriken, ehdoton maailmanmestari verkkokaupassa, digitaalisessa markkinoinnissa ja SEO-copywritingissa Pohjoismaiden markkinoille. "
         "Kirjoita AINA JA VAIN suomeksi. "
@@ -243,7 +243,7 @@ SEO_DIREKTIV = {
         "SEO-AVAINSANAT: Lisää 5 relevanttia hakusanaa Googlea varten.\n"
         "Älä käytä emojeita tai värillisiä merkkejä. Erota tuotteet toisistaan viivalla (---)."
     ),
-    "Engelska": (
+    "English": (
         "You are TextFabriken, an absolute world champion in e-commerce, digital marketing, and SEO copywriting for the Nordic and international market. "
         "ALWAYS write in English. "
         "You have been given a file with raw data or a list of products. Your task is to transform this list into extremely compelling, bold, and modern product descriptions in English. "
