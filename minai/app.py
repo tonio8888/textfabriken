@@ -48,6 +48,7 @@ UI_TEXTS = {
         "tone_label": "🎨 Tonläge för de genererade texterna",
         "platform_label": "🛒 Publiceringsmål (justerar teckengränser)",
         "char_count_warning": "⚠️ {field} är {count} tecken – överskrider {limit}-teckensgränsen för {platform}",
+        "chat_as_product_checkbox": "📦 Behandla detta meddelande som produktdata (ger CSV/Excel-export)",
         "warning_text": "⚠️ **Kontrollera alltid siffror och specifikationer** (t.ex. batteritid, mått, prestanda) mot din egen produktdata innan du publicerar texterna.",
         "processing_batch": "*Bearbetar del {i} av {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken bearbetar dina ord i molnet...*",
@@ -94,6 +95,7 @@ UI_TEXTS = {
         "tone_label": "🎨 Tone for de genererte tekstene",
         "platform_label": "🛒 Publiseringsmål (justerer tegngrenser)",
         "char_count_warning": "⚠️ {field} er {count} tegn – overskrider grensen på {limit} tegn for {platform}",
+        "chat_as_product_checkbox": "📦 Behandle denne meldingen som produktdata (gir CSV/Excel-eksport)",
         "warning_text": "⚠️ **Kontroller alltid tall og spesifikasjoner** (f.eks. batteritid, mål, ytelse) mot din egen produktdata før du publiserer tekstene.",
         "processing_batch": "*Behandler del {i} av {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken behandler ordene dine i skyen...*",
@@ -140,6 +142,7 @@ UI_TEXTS = {
         "tone_label": "🎨 Tone for de genererede tekster",
         "platform_label": "🛒 Udgivelsesmål (justerer tegngrænser)",
         "char_count_warning": "⚠️ {field} er {count} tegn – overskrider grænsen på {limit} tegn for {platform}",
+        "chat_as_product_checkbox": "📦 Behandl denne besked som produktdata (giver CSV/Excel-eksport)",
         "warning_text": "⚠️ **Kontroller altid tal og specifikationer** (f.eks. batteritid, mål, ydeevne) mod dine egne produktdata, inden du publicerer teksterne.",
         "processing_batch": "*Behandler del {i} af {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken behandler dine ord i skyen...*",
@@ -186,6 +189,7 @@ UI_TEXTS = {
         "tone_label": "🎨 Tuotetekstien sävy",
         "platform_label": "🛒 Julkaisukohde (mukauttaa merkkirajoja)",
         "char_count_warning": "⚠️ {field} on {count} merkkiä – ylittää alustan {platform} {limit} merkin rajan",
+        "chat_as_product_checkbox": "📦 Käsittele tämä viesti tuotetietona (mahdollistaa CSV/Excel-viennin)",
         "warning_text": "⚠️ **Tarkista aina luvut ja spesifikaatiot** (esim. akun kesto, mitat, suorituskyky) omista tuotetiedoistasi ennen tekstien julkaisua.",
         "processing_batch": "*Käsitellään osaa {i}/{n} TextFabrikenin koneissa...*",
         "processing_single": "*TextFabriken käsittelee sanojasi pilvessä...*",
@@ -234,6 +238,7 @@ UI_TEXTS = {
         "tone_label": "🎨 Tone for the generated texts",
         "platform_label": "🛒 Publish target (adjusts character limits)",
         "char_count_warning": "⚠️ {field} is {count} characters – exceeds the {limit}-character limit for {platform}",
+        "chat_as_product_checkbox": "📦 Treat this message as product data (enables CSV/Excel export)",
         "warning_text": "⚠️ **Always verify figures and specifications** (e.g. battery life, dimensions, performance) against your own product data before publishing the texts.",
         "processing_batch": "*Processing part {i} of {n} in TextFabriken's machines...*",
         "processing_single": "*TextFabriken is processing your words in the cloud...*",
@@ -665,6 +670,7 @@ copy_klick = False
 
 with st.container():
     prompt = st.chat_input(t["chat_placeholder"])
+    behandla_som_produkt = st.checkbox(t["chat_as_product_checkbox"], value=False, key="behandla_som_produkt")
     with st.expander(t["expander_label"]):
         col1, col2 = st.columns(2)
         with col1:
@@ -741,11 +747,14 @@ def dela_upp_i_batchar(text, rader_per_batch=RADER_PER_BATCH):
             batchar.append(batch)
     return batchar if batchar else [text]
 
-def kor_massgenerering(extra_instruktion=""):
+def kor_massgenerering(extra_instruktion="", data=None):
     """Delar upp produktdatan i batchar och kör Groq-anrop med progressbar.
        Används av både raketknappen och chattrutan för att undvika för stora anrop (413).
        Misslyckade batchar hålls ISÄR från lyckade svar - de blandas aldrig in som om de vore
-       genererad produkttext, och användaren varnas tydligt om något gick fel."""
+       genererad produkttext, och användaren varnas tydligt om något gick fel.
+       'data' kan skickas in för att bearbeta text som INTE kommer från en uppladdad fil
+       (t.ex. när kryssrutan 'Behandla som produktdata' är ikryssad i chattrutan)."""
+    rådata = data if data is not None else extratext
     direktiv = SEO_DIREKTIV[st.session_state.sprak]
     tonlage_instruktion = TONLAGE_INSTRUKTIONER[st.session_state.sprak][st.session_state.tonlage]
     if tonlage_instruktion:
@@ -756,7 +765,7 @@ def kor_massgenerering(extra_instruktion=""):
     progress_bar = st.progress(0)
     status_text = st.empty()
 
-    batchar = dela_upp_i_batchar(extratext)
+    batchar = dela_upp_i_batchar(rådata)
     lyckade_svar = []
     antal_misslyckade = 0
     for i, batch in enumerate(batchar):
@@ -817,11 +826,17 @@ if prompt:
 
     # Skicka bara med hela produktlistan om filen INTE redan bearbetats via raketknappen
     anvand_produktdata = extratext and not st.session_state.fil_bearbetad
+    # Om ingen fil finns men kryssrutan "Behandla som produktdata" är ikryssad, behandla själva
+    # chattmeddelandet som rå produktdata (samma strukturerade pipeline, med export-stöd)
+    anvand_chatt_som_produktdata = behandla_som_produkt and not extratext
 
     with st.chat_message("assistant", avatar="🏭"):
-        if anvand_produktdata:
+        if anvand_produktdata or anvand_chatt_som_produktdata:
             # Använd samma säkra batch-funktion som raketknappen, för att undvika för stora anrop (413)
-            ai_svar = kor_massgenerering(extra_instruktion=prompt)
+            if anvand_chatt_som_produktdata:
+                ai_svar = kor_massgenerering(data=prompt)
+            else:
+                ai_svar = kor_massgenerering(extra_instruktion=prompt)
             if ai_svar is not None:  # None = alla batchar misslyckades, felmeddelande redan visat
                 st.markdown(f"**{t['assistant_label']}:**\n\n{ai_svar}")
                 st.session_state.messages.append({"role": "assistant", "content": ai_svar})
