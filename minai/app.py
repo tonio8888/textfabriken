@@ -650,16 +650,14 @@ if "plattform" not in st.session_state: st.session_state.plattform = "ingen"
 t = UI_TEXTS[st.session_state.sprak]  # Genväg till aktuellt gränssnittsspråks texter
 
 # Huvudsida (appnamnet TEXTFABRIKEN översätts ALDRIG)
-st.markdown("""
+# Loggan läses in från samma fil som används som avatar i chatten, så de ALLTID är identiska
+import base64
+with open(AVATAR_PATH, "rb") as _f:
+    _logo_b64 = base64.b64encode(_f.read()).decode()
+
+st.markdown(f"""
 <div style="display:flex;justify-content:center;padding:1rem 0 1.5rem;">
-  <div style="width:64px;height:64px;border-radius:16px;background:#378add;display:flex;align-items:center;justify-content:center;">
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M3 21h18" />
-      <path d="M5 21V10l5 3v-3l5 3v-3l5 3v8" />
-      <rect x="5" y="10" width="4" height="4" fill="white" stroke="none" />
-      <path d="M9 4h2v3H9z" fill="white" stroke="none" />
-    </svg>
-  </div>
+  <img src="data:image/png;base64,{_logo_b64}" width="64" height="64" style="border-radius:16px;" />
 </div>
 """, unsafe_allow_html=True)
 st.subheader(t["subheader"])
