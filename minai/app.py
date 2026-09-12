@@ -620,7 +620,18 @@ if "plattform" not in st.session_state: st.session_state.plattform = "ingen"
 t = UI_TEXTS[st.session_state.sprak]  # Genväg till aktuellt gränssnittsspråks texter
 
 # Huvudsida (appnamnet TEXTFABRIKEN översätts ALDRIG)
-st.title("🏭 TEXTFABRIKEN AI")
+st.markdown("""
+<div style="display:flex;justify-content:center;padding:1rem 0 1.5rem;">
+  <div style="width:64px;height:64px;border-radius:16px;background:#378add;display:flex;align-items:center;justify-content:center;">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 21h18" />
+      <path d="M5 21V10l5 3v-3l5 3v-3l5 3v8" />
+      <rect x="5" y="10" width="4" height="4" fill="white" stroke="none" />
+      <path d="M9 4h2v3H9z" fill="white" stroke="none" />
+    </svg>
+  </div>
+</div>
+""", unsafe_allow_html=True)
 st.subheader(t["subheader"])
 st.write(t["intro"])
 
@@ -629,7 +640,7 @@ with st.expander(t["howto_header"]):
 
 # --- SIDOMENY ---
 with st.sidebar:
-    st.markdown("# 🏭 TEXTFABRIKEN")
+    st.markdown('<p style="font-size:20px;font-weight:600;margin:0 0 0.5rem;">Text<span style="color:#378add;">Fabriken</span> AI</p>', unsafe_allow_html=True)
     st.write("---")
 
     vald_sprak = st.selectbox(t["lang_label"], SPRAK_ALTERNATIV, index=SPRAK_ALTERNATIV.index(st.session_state.sprak))
