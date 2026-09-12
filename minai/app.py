@@ -42,6 +42,8 @@ UI_TEXTS = {
         "regenerate_button": "🔄 Regenerera denna produkt",
         "delete_button": "🗑️ Ta bort produkt",
         "regenerating_text": "Regenererar produkten...",
+        "batch_failure_warning": "⚠️ {failed} av {total} delar kunde inte genereras på grund av ett tillfälligt serverfel. Produkterna i dessa delar saknas nedan – testa att köra igen om en liten stund.",
+        "all_failed_error": "❌ Kunde inte generera några texter just nu på grund av ett serverfel. Försök igen om en liten stund.",
         "warning_text": "⚠️ **Kontrollera alltid siffror och specifikationer** (t.ex. batteritid, mått, prestanda) mot din egen produktdata innan du publicerar texterna.",
         "processing_batch": "*Bearbetar del {i} av {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken bearbetar dina ord i molnet...*",
@@ -82,6 +84,8 @@ UI_TEXTS = {
         "regenerate_button": "🔄 Regenerer dette produktet",
         "delete_button": "🗑️ Fjern produkt",
         "regenerating_text": "Regenererer produktet...",
+        "batch_failure_warning": "⚠️ {failed} av {total} deler kunne ikke genereres på grunn av en midlertidig serverfeil. Produktene i disse delene mangler nedenfor – prøv å kjøre igjen om en liten stund.",
+        "all_failed_error": "❌ Kunne ikke generere noen tekster akkurat nå på grunn av en serverfeil. Prøv igjen om en liten stund.",
         "warning_text": "⚠️ **Kontroller alltid tall og spesifikasjoner** (f.eks. batteritid, mål, ytelse) mot din egen produktdata før du publiserer tekstene.",
         "processing_batch": "*Behandler del {i} av {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken behandler ordene dine i skyen...*",
@@ -122,6 +126,8 @@ UI_TEXTS = {
         "regenerate_button": "🔄 Regenerer dette produkt",
         "delete_button": "🗑️ Fjern produkt",
         "regenerating_text": "Regenererer produktet...",
+        "batch_failure_warning": "⚠️ {failed} af {total} dele kunne ikke genereres på grund af en midlertidig serverfejl. Produkterne i disse dele mangler nedenfor – prøv at køre igen om lidt.",
+        "all_failed_error": "❌ Kunne ikke generere nogen tekster lige nu på grund af en serverfejl. Prøv igen om lidt.",
         "warning_text": "⚠️ **Kontroller altid tal og specifikationer** (f.eks. batteritid, mål, ydeevne) mod dine egne produktdata, inden du publicerer teksterne.",
         "processing_batch": "*Behandler del {i} af {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken behandler dine ord i skyen...*",
@@ -162,6 +168,8 @@ UI_TEXTS = {
         "regenerate_button": "🔄 Luo tämä tuote uudelleen",
         "delete_button": "🗑️ Poista tuote",
         "regenerating_text": "Luodaan tuotetta uudelleen...",
+        "batch_failure_warning": "⚠️ {failed}/{total} osaa ei voitu luoda tilapäisen palvelinvirheen vuoksi. Näiden osien tuotteet puuttuvat alta – yritä ajaa uudelleen hetken kuluttua.",
+        "all_failed_error": "❌ Tekstejä ei voitu luoda juuri nyt palvelinvirheen vuoksi. Yritä uudelleen hetken kuluttua.",
         "warning_text": "⚠️ **Tarkista aina luvut ja spesifikaatiot** (esim. akun kesto, mitat, suorituskyky) omista tuotetiedoistasi ennen tekstien julkaisua.",
         "processing_batch": "*Käsitellään osaa {i}/{n} TextFabrikenin koneissa...*",
         "processing_single": "*TextFabriken käsittelee sanojasi pilvessä...*",
@@ -204,6 +212,8 @@ UI_TEXTS = {
         "regenerate_button": "🔄 Regenerate this product",
         "delete_button": "🗑️ Remove product",
         "regenerating_text": "Regenerating the product...",
+        "batch_failure_warning": "⚠️ {failed} of {total} parts could not be generated due to a temporary server error. The products in those parts are missing below – try running it again shortly.",
+        "all_failed_error": "❌ Could not generate any text right now due to a server error. Please try again shortly.",
         "warning_text": "⚠️ **Always verify figures and specifications** (e.g. battery life, dimensions, performance) against your own product data before publishing the texts.",
         "processing_batch": "*Processing part {i} of {n} in TextFabriken's machines...*",
         "processing_single": "*TextFabriken is processing your words in the cloud...*",
@@ -560,6 +570,8 @@ if uploaded_file is not None:
 
 # STENSÄKRAD SAMMANKOPPLING MED GROQ (med automatiska omförsök vid rate limit)
 def fraga_groq(system_prompt, user_prompt, forsok=5):
+    """Returnerar (lyckades: bool, text: str). Vid fel är lyckades=False och text ett läsbart felmeddelande
+       - detta gör att anropande kod aldrig av misstag kan blanda ihop ett felmeddelande med riktigt AI-genererat innehåll."""
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {
         "Authorization": "Bearer " + GROQ_API_KEY,
@@ -578,16 +590,16 @@ def fraga_groq(system_prompt, user_prompt, forsok=5):
         try:
             respons = requests.post(url, json=data, headers=headers)
             if respons.status_code == 200:
-                return respons.json()["choices"][0]["message"]["content"]
+                return True, respons.json()["choices"][0]["message"]["content"]
             elif respons.status_code == 429:
                 vantetid = int(float(respons.headers.get("Retry-After", 10))) + 1
                 time.sleep(vantetid)
                 continue
             else:
-                return "Anslutningsfel (Status " + str(respons.status_code) + ")"
+                return False, "Anslutningsfel (Status " + str(respons.status_code) + ")"
         except Exception as e:
-            return "Kunde inte skicka förfrågan."
-    return "Groq-servern är överbelastad just nu (Status 429). Försök igen om en liten stund."
+            return False, "Kunde inte skicka förfrågan."
+    return False, "Groq-servern är överbelastad just nu (Status 429). Försök igen om en liten stund."
 
 # --- BATCH-HANTERING FÖR STORA PRODUKTLISTOR ---
 RADER_PER_BATCH = 15  # Sänkt från 40 för att undvika avkapade svar och för stora anrop (413)
@@ -603,20 +615,26 @@ def dela_upp_i_batchar(text, rader_per_batch=RADER_PER_BATCH):
 
 def kor_massgenerering(extra_instruktion=""):
     """Delar upp produktdatan i batchar och kör Groq-anrop med progressbar.
-       Används av både raketknappen och chattrutan för att undvika för stora anrop (413)."""
+       Används av både raketknappen och chattrutan för att undvika för stora anrop (413).
+       Misslyckade batchar hålls ISÄR från lyckade svar - de blandas aldrig in som om de vore
+       genererad produkttext, och användaren varnas tydligt om något gick fel."""
     direktiv = SEO_DIREKTIV[st.session_state.sprak]
     progress_bar = st.progress(0)
     status_text = st.empty()
 
     batchar = dela_upp_i_batchar(extratext)
-    alla_svar = []
+    lyckade_svar = []
+    antal_misslyckade = 0
     for i, batch in enumerate(batchar):
         status_text.markdown(t["processing_batch"].format(i=i + 1, n=len(batchar)))
         anvandarprompt = "Produktlista/Rådata:\n" + batch
         if extra_instruktion:
             anvandarprompt = "Användarens extra instruktion: " + extra_instruktion + "\n\n" + anvandarprompt
-        svar = fraga_groq(direktiv, anvandarprompt)
-        alla_svar.append(svar)
+        lyckades, svar = fraga_groq(direktiv, anvandarprompt)
+        if lyckades:
+            lyckade_svar.append(svar)
+        else:
+            antal_misslyckade += 1
         progress_bar.progress((i + 1) / len(batchar))
         if i < len(batchar) - 1:
             time.sleep(2)  # Kort paus mellan batchar för att undvika rate limit
@@ -624,7 +642,13 @@ def kor_massgenerering(extra_instruktion=""):
     status_text.empty()
     progress_bar.empty()
 
-    ai_svar = "\n\n---\n\n".join(alla_svar)
+    if antal_misslyckade > 0 and lyckade_svar:
+        st.warning(t["batch_failure_warning"].format(failed=antal_misslyckade, total=len(batchar)))
+    elif antal_misslyckade > 0 and not lyckade_svar:
+        st.error(t["all_failed_error"])
+        return None
+
+    ai_svar = "\n\n---\n\n".join(lyckade_svar)
     return ai_svar + "\n\n---\n" + t["warning_text"]
 
 # LOGIK FÖR RAKET-KNAPPEN
@@ -637,19 +661,20 @@ if copy_klick:
         st.session_state.messages.append({"role": "user", "content": prompt_text})
         with st.chat_message("assistant", avatar="🏭"):
             ai_svar_med_varning = kor_massgenerering()
-            st.markdown(f"**{t['assistant_label']}:**\n\n{ai_svar_med_varning}")
-            st.session_state.messages.append({"role": "assistant", "content": ai_svar_med_varning})
-            st.session_state.generated_file_content = ai_svar_med_varning
-            st.session_state.show_download = True
-            st.session_state.fil_bearbetad = True  # Markera filen som klar - chatten blir nu fri
-            parsade = parsa_produkter(ai_svar_med_varning, st.session_state.sprak)
-            st.session_state.produkter = [
-                {"id": uuid.uuid4().hex[:8], "namn": n, "beskrivning": d, "fordelar": f, "taggar": tg}
-                for n, d, f, tg in parsade
-            ]
-            st.session_state.saved_sessions[st.session_state.current_session_name] = {"messages": st.session_state.messages, "file_content": st.session_state.generated_file_content, "show_download": st.session_state.show_download}
-            db_spara_session(st.session_state.kund_id, st.session_state.current_session_name, st.session_state.messages, st.session_state.generated_file_content, st.session_state.show_download)
-            st.rerun()
+            if ai_svar_med_varning is not None:  # None = alla batchar misslyckades, felmeddelande redan visat
+                st.markdown(f"**{t['assistant_label']}:**\n\n{ai_svar_med_varning}")
+                st.session_state.messages.append({"role": "assistant", "content": ai_svar_med_varning})
+                st.session_state.generated_file_content = ai_svar_med_varning
+                st.session_state.show_download = True
+                st.session_state.fil_bearbetad = True  # Markera filen som klar - chatten blir nu fri
+                parsade = parsa_produkter(ai_svar_med_varning, st.session_state.sprak)
+                st.session_state.produkter = [
+                    {"id": uuid.uuid4().hex[:8], "namn": n, "beskrivning": d, "fordelar": f, "taggar": tg}
+                    for n, d, f, tg in parsade
+                ]
+                st.session_state.saved_sessions[st.session_state.current_session_name] = {"messages": st.session_state.messages, "file_content": st.session_state.generated_file_content, "show_download": st.session_state.show_download}
+                db_spara_session(st.session_state.kund_id, st.session_state.current_session_name, st.session_state.messages, st.session_state.generated_file_content, st.session_state.show_download)
+                st.rerun()
 
 # LOGIK FÖR VANLIGA CHATTRUTAN
 if prompt:
@@ -663,27 +688,29 @@ if prompt:
         if anvand_produktdata:
             # Använd samma säkra batch-funktion som raketknappen, för att undvika för stora anrop (413)
             ai_svar = kor_massgenerering(extra_instruktion=prompt)
-            st.markdown(f"**{t['assistant_label']}:**\n\n{ai_svar}")
-            st.session_state.messages.append({"role": "assistant", "content": ai_svar})
-            st.session_state.generated_file_content = ai_svar
-            st.session_state.show_download = True
-            st.session_state.fil_bearbetad = True
-            parsade = parsa_produkter(ai_svar, st.session_state.sprak)
-            st.session_state.produkter = [
-                {"id": uuid.uuid4().hex[:8], "namn": n, "beskrivning": d, "fordelar": f, "taggar": tg}
-                for n, d, f, tg in parsade
-            ]
+            if ai_svar is not None:  # None = alla batchar misslyckades, felmeddelande redan visat
+                st.markdown(f"**{t['assistant_label']}:**\n\n{ai_svar}")
+                st.session_state.messages.append({"role": "assistant", "content": ai_svar})
+                st.session_state.generated_file_content = ai_svar
+                st.session_state.show_download = True
+                st.session_state.fil_bearbetad = True
+                parsade = parsa_produkter(ai_svar, st.session_state.sprak)
+                st.session_state.produkter = [
+                    {"id": uuid.uuid4().hex[:8], "namn": n, "beskrivning": d, "fordelar": f, "taggar": tg}
+                    for n, d, f, tg in parsade
+                ]
         else:
             message_placeholder = st.empty()
             message_placeholder.markdown(t["processing_single"])
             system_d = t["system_prompt_free_chat"]
-            ai_svar = fraga_groq(system_d, prompt)
+            lyckades, ai_svar = fraga_groq(system_d, prompt)
             message_placeholder.markdown(f"**{t['assistant_label']}:**\n\n{ai_svar}")
             st.session_state.messages.append({"role": "assistant", "content": ai_svar})
-            # Gör svaret nedladdningsbart som Word-fil, precis som vid massgenerering
-            st.session_state.generated_file_content = ai_svar
-            st.session_state.show_download = True
-            st.session_state.produkter = []  # Fritt chattsvar följer inte produktstrukturen
+            if lyckades:
+                # Gör svaret nedladdningsbart som Word-fil, precis som vid massgenerering
+                st.session_state.generated_file_content = ai_svar
+                st.session_state.show_download = True
+                st.session_state.produkter = []  # Fritt chattsvar följer inte produktstrukturen
 
         if uploaded_file is not None:
             st.session_state.saved_sessions[st.session_state.current_session_name] = {"messages": st.session_state.messages, "file_content": st.session_state.generated_file_content, "show_download": st.session_state.show_download}
@@ -716,11 +743,14 @@ if st.session_state.show_download and st.session_state.generated_file_content:
                                 f"Här är den nuvarande texten som kontext (skriv en ny, bättre variant, samma struktur):\n"
                                 f"{h['desc']} {produkt['beskrivning']}\n{h['fordelar']}\n{produkt['fordelar']}\n{h['taggar']} {produkt['taggar']}"
                             )
-                            svar = fraga_groq(direktiv, regen_prompt)
-                            ny_produkt = parsa_produkter(svar, st.session_state.sprak)
-                            if ny_produkt:
-                                n, d, f, tg = ny_produkt[0]
-                                produkt["namn"], produkt["beskrivning"], produkt["fordelar"], produkt["taggar"] = n, d, f, tg
+                            svar_lyckades, svar = fraga_groq(direktiv, regen_prompt)
+                            if svar_lyckades:
+                                ny_produkt = parsa_produkter(svar, st.session_state.sprak)
+                                if ny_produkt:
+                                    n, d, f, tg = ny_produkt[0]
+                                    produkt["namn"], produkt["beskrivning"], produkt["fordelar"], produkt["taggar"] = n, d, f, tg
+                            else:
+                                st.error(svar)  # Visa felmeddelandet tydligt - skriv aldrig över produkten med felet
                         st.rerun()
                 with col_del:
                     if st.button(t["delete_button"], key=f"del_{produkt['id']}", use_container_width=True):
