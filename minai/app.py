@@ -722,14 +722,14 @@ extratext = ""
 copy_klick = False
 
 with st.container():
-    prompt = st.chat_input(t["chat_placeholder"])
-    behandla_som_produkt = st.checkbox(t["chat_as_product_checkbox"], value=False, key="behandla_som_produkt")
-    with st.expander(t["expander_label"]):
+    with st.expander(t["expander_label"], expanded=True):
         col1, col2 = st.columns(2)
         with col1:
             uploaded_file = st.file_uploader(t["uploader_label"], type=["pdf", "txt", "docx"], label_visibility="collapsed")
         with col2:
             copy_klick = st.button(t["rocket_button"], use_container_width=True, type="primary")
+    prompt = st.chat_input(t["chat_placeholder"])
+    behandla_som_produkt = st.checkbox(t["chat_as_product_checkbox"], value=False, key="behandla_som_produkt")
 
 # Processa filen
 if uploaded_file is not None:
