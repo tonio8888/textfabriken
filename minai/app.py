@@ -329,7 +329,10 @@ def parsa_produkter(text, sprak):
 
 def skapa_csv(produkter, kolumner):
     output = io.StringIO()
-    writer = csv.writer(output)
+    # Semikolon som avgränsare (inte komma) - det är standard i svenska/nordiska Excel-installationer,
+    # eftersom komma redan används som decimaltecken där. Med komma som avgränsare misslyckas Excel
+    # att dela upp kolumnerna och rader som börjar med "-" (t.ex. punktlistor) tolkas felaktigt som formler.
+    writer = csv.writer(output, delimiter=';')
     writer.writerow(kolumner)
     for rad in produkter:
         writer.writerow(rad)
