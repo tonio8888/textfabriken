@@ -38,6 +38,10 @@ UI_TEXTS = {
         "download_button": "📝 Ladda ner produkttexter (.docx)",
         "download_button_csv": "📊 Ladda ner som CSV (.csv)",
         "download_button_xlsx": "📊 Ladda ner som Excel (.xlsx)",
+        "edit_products_header": "### ✏️ Redigera produkter innan export",
+        "regenerate_button": "🔄 Regenerera denna produkt",
+        "delete_button": "🗑️ Ta bort produkt",
+        "regenerating_text": "Regenererar produkten...",
         "warning_text": "⚠️ **Kontrollera alltid siffror och specifikationer** (t.ex. batteritid, mått, prestanda) mot din egen produktdata innan du publicerar texterna.",
         "processing_batch": "*Bearbetar del {i} av {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken bearbetar dina ord i molnet...*",
@@ -74,6 +78,10 @@ UI_TEXTS = {
         "download_button": "📝 Last ned produkttekster (.docx)",
         "download_button_csv": "📊 Last ned som CSV (.csv)",
         "download_button_xlsx": "📊 Last ned som Excel (.xlsx)",
+        "edit_products_header": "### ✏️ Rediger produkter før eksport",
+        "regenerate_button": "🔄 Regenerer dette produktet",
+        "delete_button": "🗑️ Fjern produkt",
+        "regenerating_text": "Regenererer produktet...",
         "warning_text": "⚠️ **Kontroller alltid tall og spesifikasjoner** (f.eks. batteritid, mål, ytelse) mot din egen produktdata før du publiserer tekstene.",
         "processing_batch": "*Behandler del {i} av {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken behandler ordene dine i skyen...*",
@@ -110,6 +118,10 @@ UI_TEXTS = {
         "download_button": "📝 Download produkttekster (.docx)",
         "download_button_csv": "📊 Download som CSV (.csv)",
         "download_button_xlsx": "📊 Download som Excel (.xlsx)",
+        "edit_products_header": "### ✏️ Rediger produkter før eksport",
+        "regenerate_button": "🔄 Regenerer dette produkt",
+        "delete_button": "🗑️ Fjern produkt",
+        "regenerating_text": "Regenererer produktet...",
         "warning_text": "⚠️ **Kontroller altid tal og specifikationer** (f.eks. batteritid, mål, ydeevne) mod dine egne produktdata, inden du publicerer teksterne.",
         "processing_batch": "*Behandler del {i} af {n} i TextFabrikens maskiner...*",
         "processing_single": "*TextFabriken behandler dine ord i skyen...*",
@@ -146,6 +158,10 @@ UI_TEXTS = {
         "download_button": "📝 Lataa tuotetekstit (.docx)",
         "download_button_csv": "📊 Lataa CSV-tiedostona (.csv)",
         "download_button_xlsx": "📊 Lataa Excel-tiedostona (.xlsx)",
+        "edit_products_header": "### ✏️ Muokkaa tuotteita ennen vientiä",
+        "regenerate_button": "🔄 Luo tämä tuote uudelleen",
+        "delete_button": "🗑️ Poista tuote",
+        "regenerating_text": "Luodaan tuotetta uudelleen...",
         "warning_text": "⚠️ **Tarkista aina luvut ja spesifikaatiot** (esim. akun kesto, mitat, suorituskyky) omista tuotetiedoistasi ennen tekstien julkaisua.",
         "processing_batch": "*Käsitellään osaa {i}/{n} TextFabrikenin koneissa...*",
         "processing_single": "*TextFabriken käsittelee sanojasi pilvessä...*",
@@ -184,6 +200,10 @@ UI_TEXTS = {
         "download_button": "📝 Download product texts (.docx)",
         "download_button_csv": "📊 Download as CSV (.csv)",
         "download_button_xlsx": "📊 Download as Excel (.xlsx)",
+        "edit_products_header": "### ✏️ Edit products before export",
+        "regenerate_button": "🔄 Regenerate this product",
+        "delete_button": "🗑️ Remove product",
+        "regenerating_text": "Regenerating the product...",
         "warning_text": "⚠️ **Always verify figures and specifications** (e.g. battery life, dimensions, performance) against your own product data before publishing the texts.",
         "processing_batch": "*Processing part {i} of {n} in TextFabriken's machines...*",
         "processing_single": "*TextFabriken is processing your words in the cloud...*",
@@ -359,6 +379,17 @@ def skapa_xlsx(produkter, kolumner):
     wb.save(bio)
     return bio.getvalue()
 
+def produkter_till_text(produkter, sprak):
+    """Bygger om en lista av produkt-dictar (efter eventuell redigering/regenerering) till samma
+       textformat som AI:n normalt skriver ut, så att Word-exporten alltid speglar de redigerade värdena."""
+    h = PRODUKT_RUBRIKER[sprak]
+    block_lista = []
+    for p in produkter:
+        block = f"**{p['namn']}**\n{h['desc']} {p['beskrivning']}\n{h['fordelar']}\n{p['fordelar']}\n{h['taggar']} {p['taggar']}"
+        block_lista.append(block)
+    text = "\n\n---\n\n".join(block_lista)
+    return text + "\n\n---\n" + UI_TEXTS[sprak]["warning_text"]
+
 # --- DATABAS FÖR PERMANENT LAGRING AV SPARADE PRODUKTLISTOR (uppdelat per kund) ---
 DB_FIL = "textfabriken.db"
 
@@ -445,6 +476,7 @@ if "show_download" not in st.session_state: st.session_state.show_download = Fal
 if "fil_bearbetad" not in st.session_state: st.session_state.fil_bearbetad = False
 if "senast_uppladdad_fil" not in st.session_state: st.session_state.senast_uppladdad_fil = None
 if "sprak" not in st.session_state: st.session_state.sprak = "Svenska"
+if "produkter" not in st.session_state: st.session_state.produkter = []
 
 t = UI_TEXTS[st.session_state.sprak]  # Genväg till aktuellt gränssnittsspråks texter
 
@@ -610,6 +642,11 @@ if copy_klick:
             st.session_state.generated_file_content = ai_svar_med_varning
             st.session_state.show_download = True
             st.session_state.fil_bearbetad = True  # Markera filen som klar - chatten blir nu fri
+            parsade = parsa_produkter(ai_svar_med_varning, st.session_state.sprak)
+            st.session_state.produkter = [
+                {"id": uuid.uuid4().hex[:8], "namn": n, "beskrivning": d, "fordelar": f, "taggar": tg}
+                for n, d, f, tg in parsade
+            ]
             st.session_state.saved_sessions[st.session_state.current_session_name] = {"messages": st.session_state.messages, "file_content": st.session_state.generated_file_content, "show_download": st.session_state.show_download}
             db_spara_session(st.session_state.kund_id, st.session_state.current_session_name, st.session_state.messages, st.session_state.generated_file_content, st.session_state.show_download)
             st.rerun()
@@ -631,6 +668,11 @@ if prompt:
             st.session_state.generated_file_content = ai_svar
             st.session_state.show_download = True
             st.session_state.fil_bearbetad = True
+            parsade = parsa_produkter(ai_svar, st.session_state.sprak)
+            st.session_state.produkter = [
+                {"id": uuid.uuid4().hex[:8], "namn": n, "beskrivning": d, "fordelar": f, "taggar": tg}
+                for n, d, f, tg in parsade
+            ]
         else:
             message_placeholder = st.empty()
             message_placeholder.markdown(t["processing_single"])
@@ -641,37 +683,76 @@ if prompt:
             # Gör svaret nedladdningsbart som Word-fil, precis som vid massgenerering
             st.session_state.generated_file_content = ai_svar
             st.session_state.show_download = True
+            st.session_state.produkter = []  # Fritt chattsvar följer inte produktstrukturen
 
         if uploaded_file is not None:
             st.session_state.saved_sessions[st.session_state.current_session_name] = {"messages": st.session_state.messages, "file_content": st.session_state.generated_file_content, "show_download": st.session_state.show_download}
             db_spara_session(st.session_state.kund_id, st.session_state.current_session_name, st.session_state.messages, st.session_state.generated_file_content, st.session_state.show_download)
         st.rerun()
 
-# VISA NEDLADDNINGSKNAPPAR (Word, CSV, Excel)
+# VISA REDIGERINGSSEKTION + NEDLADDNINGSKNAPPAR (Word, CSV, Excel)
 if st.session_state.show_download and st.session_state.generated_file_content:
     st.write("---")
+
+    if st.session_state.produkter:
+        st.markdown(t["edit_products_header"])
+        kolumner = EXPORT_KOLUMNER[st.session_state.sprak]
+
+        for produkt in list(st.session_state.produkter):
+            with st.expander(f"✏️ {produkt['namn']}"):
+                produkt["namn"] = st.text_input(kolumner[0], value=produkt["namn"], key=f"namn_{produkt['id']}")
+                produkt["beskrivning"] = st.text_area(kolumner[1], value=produkt["beskrivning"], key=f"besk_{produkt['id']}", height=120)
+                produkt["fordelar"] = st.text_area(kolumner[2], value=produkt["fordelar"], key=f"ford_{produkt['id']}", height=100)
+                produkt["taggar"] = st.text_input(kolumner[3], value=produkt["taggar"], key=f"tag_{produkt['id']}")
+
+                col_regen, col_del = st.columns(2)
+                with col_regen:
+                    if st.button(t["regenerate_button"], key=f"regen_{produkt['id']}", use_container_width=True):
+                        with st.spinner(t["regenerating_text"]):
+                            direktiv = SEO_DIREKTIV[st.session_state.sprak]
+                            h = PRODUKT_RUBRIKER[st.session_state.sprak]
+                            regen_prompt = (
+                                f"Skriv om EXAKT EN produkt, med samma produktnamn: \"{produkt['namn']}\". "
+                                f"Här är den nuvarande texten som kontext (skriv en ny, bättre variant, samma struktur):\n"
+                                f"{h['desc']} {produkt['beskrivning']}\n{h['fordelar']}\n{produkt['fordelar']}\n{h['taggar']} {produkt['taggar']}"
+                            )
+                            svar = fraga_groq(direktiv, regen_prompt)
+                            ny_produkt = parsa_produkter(svar, st.session_state.sprak)
+                            if ny_produkt:
+                                n, d, f, tg = ny_produkt[0]
+                                produkt["namn"], produkt["beskrivning"], produkt["fordelar"], produkt["taggar"] = n, d, f, tg
+                        st.rerun()
+                with col_del:
+                    if st.button(t["delete_button"], key=f"del_{produkt['id']}", use_container_width=True):
+                        st.session_state.produkter = [p for p in st.session_state.produkter if p["id"] != produkt["id"]]
+                        st.rerun()
+
     st.markdown(t["download_header"])
     st.info(t["download_info"])
-    rensad_text = st.session_state.generated_file_content.replace(f"**{t['assistant_label']}:**\n\n", "")
+
+    if st.session_state.produkter:
+        text_for_word = produkter_till_text(st.session_state.produkter, st.session_state.sprak)
+        produkter_rader = [[p["namn"], p["beskrivning"], p["fordelar"], p["taggar"]] for p in st.session_state.produkter]
+    else:
+        text_for_word = st.session_state.generated_file_content.replace(f"**{t['assistant_label']}:**\n\n", "")
+        produkter_rader = []
 
     col_word, col_csv, col_xlsx = st.columns(3)
 
     with col_word:
         doc = Document()
         doc.add_heading(t["doc_heading"], level=1)
-        for rad in rensad_text.split('\n'): doc.add_paragraph(rad)
+        for rad in text_for_word.split('\n'): doc.add_paragraph(rad)
         bio_docx = io.BytesIO()
         doc.save(bio_docx)
         st.download_button(label=t["download_button"], data=bio_docx.getvalue(), file_name="textfabriken_produkter.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document", use_container_width=True)
 
-    produkter = parsa_produkter(rensad_text, st.session_state.sprak)
-    kolumner = EXPORT_KOLUMNER[st.session_state.sprak]
-
-    if produkter:
+    if produkter_rader:
+        kolumner = EXPORT_KOLUMNER[st.session_state.sprak]
         with col_csv:
-            csv_data = skapa_csv(produkter, kolumner)
+            csv_data = skapa_csv(produkter_rader, kolumner)
             st.download_button(label=t["download_button_csv"], data=csv_data, file_name="textfabriken_produkter.csv", mime="text/csv", use_container_width=True)
 
         with col_xlsx:
-            xlsx_data = skapa_xlsx(produkter, kolumner)
+            xlsx_data = skapa_xlsx(produkter_rader, kolumner)
             st.download_button(label=t["download_button_xlsx"], data=xlsx_data, file_name="textfabriken_produkter.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True)
