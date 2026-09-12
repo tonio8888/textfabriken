@@ -660,7 +660,7 @@ st.markdown(f"""
   <img src="data:image/png;base64,{_logo_b64}" width="64" height="64" style="border-radius:16px;" />
 </div>
 """, unsafe_allow_html=True)
-st.markdown(f'<h3 style="text-align:center;margin-top:0;">{t["subheader"]}</h3>', unsafe_allow_html=True)
+st.markdown(f'<h3 style="text-align:center;margin-top:0;margin-bottom:1.5rem;">{t["subheader"]}</h3>', unsafe_allow_html=True)
 
 with st.expander(t["howto_header"]):
     st.markdown(t["howto_steps"])
