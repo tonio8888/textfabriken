@@ -84,18 +84,18 @@ UI_TEXTS = {
     },
     "Danska": {
         "subheader": "Nordens smarteste samlebånd til produktbeskrivelser",
-        "intro": "Upload dine rådata i bundmenuen. TextFabriken forvandler dem til sælgende SEO-tekster og laver en færdig Word-fil til dig!",
+        "intro": "Upload dine rådata i menuen nedenfor. TextFabriken forvandler dem til salgsfremmende SEO-tekster og genererer en færdig Word-fil til dig!",
         "lang_label": "🌐 Sprog til tekster og brugerflade",
         "saved_header": "📁 Gemte produktlister",
         "no_saved": "Ingen gemte lister endnu.",
         "active_now": "Aktiv nu:",
         "chat_placeholder": "Skriv en instruktion til fabrikken...",
-        "expander_label": "📎 Klik her for at indtaste produktfakta (PDF/TXT/WORD)",
+        "expander_label": "📎 Klik her for at tilføje produktdata (PDF/TXT/WORD)",
         "uploader_label": "Vælg dokument fra din computer",
         "rocket_button": "🚀 Start Masseproduktion",
         "error_no_file": "⚠️ Du skal vælge en fil i boksen til venstre først!",
         "download_header": "### 📥 Din færdige Word-fil fra TextFabriken er klar!",
-        "download_info": "💡 Inden du publicerer: dobbelttjek alle tal (mål, kapacitet, batteritid, dB-niveauer m.m.) mod leverandørens originaldata. TextFabriken skriver sælgende tekster, men er ikke ansvarlig for at specifikationerne er korrekte.",
+        "download_info": "💡 Inden du publicerer: dobbelttjek alle tal (mål, kapacitet, batteritid, dB-niveauer m.m.) mod leverandørens originaldata. TextFabriken skriver salgsfremmende tekster, men er ikke ansvarlig for at specifikationerne er korrekte.",
         "download_button": "📝 Download produkttekster (.docx)",
         "warning_text": "⚠️ **Kontroller altid tal og specifikationer** (f.eks. batteritid, mål, ydeevne) mod dine egne produktdata, inden du publicerer teksterne.",
         "processing_batch": "*Behandler del {i} af {n} i TextFabrikens maskiner...*",
@@ -108,7 +108,7 @@ UI_TEXTS = {
         "system_prompt_free_chat": (
             "Du er TextFabriken, en AI-assistent, der hjælper netbutikker med at skrive SEO-produktbeskrivelser. Svar altid på dansk. "
             "Du er ÉN specifik app, ikke en generel e-handelsplatform. Du kan KUN: "
-            "1) omdanne en uploadet produktliste (PDF/TXT/Word) til sælgende SEO-tekster, og "
+            "1) omdanne en uploadet produktliste (PDF/TXT/Word) til salgsfremmende SEO-tekster, og "
             "2) svare på generelle spørgsmål om copywriting, SEO eller produkttekster. "
             "Du kan IKKE håndtere ordrer, kundekonti, betalinger, levering, returnering eller lagerstatus – det er ikke, hvad denne app gør, og du må aldrig lade som om du kan det. "
             "Hvis brugeren vil downloade noget, du har skrevet, så bed dem bruge den blå downloadknap, der automatisk dukker op under chatten efter hvert svar. "
@@ -182,7 +182,7 @@ SEO_DIREKTIV = {
     "Danska": (
         "Du er TextFabriken, en absolut verdensmester inden for e-handel, digital markedsføring og SEO-copywriting til det nordiske marked. "
         "Skriv ALTID på dansk. "
-        "Du har fået en fil med rådata eller en liste over produkter. Din opgave er at omdanne denne liste til supersælgende, freaky og moderne produktbeskrivelser på dansk. "
+        "Du har fået en fil med rådata eller en liste over produkter. Din opgave er at omdanne denne liste til superoverbevisende, freaky og moderne produktbeskrivelser på dansk. "
         "VIGTIGT: Find aldrig på eksakte tal, mål, tekniske specifikationer eller ydeevneværdier (f.eks. batteritid, dB-niveauer, DPI, kapacitet i ml/liter), som ikke findes i den rådata, du har fået. "
         "Hvis et specifikt tal mangler i grundlaget, skriv i stedet kvalitativt (f.eks. 'lang batteritid' eller 'kraftig støjreduktion') uden at gætte et eksakt tal. "
         "VIGTIGT: Skab aldrig flere produkter end dem, der faktisk findes i rådataen. Hvis et produktnavn består af flere ord, behandl altid hele navnet som ÉT produkt – del det aldrig op i flere separate produkter. "
