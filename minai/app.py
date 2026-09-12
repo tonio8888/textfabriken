@@ -13,7 +13,7 @@ st.set_page_config(page_title="TextFabriken AI", page_icon="🏭", layout="cente
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 
 # --- SPRÅKINSTÄLLNINGAR ---
-SPRAK_ALTERNATIV = ["Svenska", "Norska", "Danska", "Finska"]
+SPRAK_ALTERNATIV = ["Svenska", "Norska", "Danska", "Finska", "Engelska"]
 
 UI_TEXTS = {
     "Svenska": {
@@ -150,6 +150,39 @@ UI_TEXTS = {
             "Jos kysymys on jotain, mitä et oikeasti osaa tehdä, kerro se rehellisesti sen sijaan, että arvailisit tai keksisit ratkaisun. Vastaa luonnollisesti ja avuliaasti näiden rajojen sisällä."
         ),
     },
+    "Engelska": {
+        "subheader": "The Nordics' smartest assembly line for product descriptions",
+        "intro": "Upload your raw data in the menu below. TextFabriken transforms it into compelling SEO copy and creates a ready-made Word file for you!",
+        "lang_label": "🌐 Language for texts and interface",
+        "saved_header": "📁 Saved product lists",
+        "no_saved": "No saved lists yet.",
+        "active_now": "Currently active:",
+        "chat_placeholder": "Write an instruction to the factory...",
+        "expander_label": "📎 Click here to add product data (PDF/TXT/WORD)",
+        "uploader_label": "Choose a document from your computer",
+        "rocket_button": "🚀 Start Mass Generation",
+        "error_no_file": "⚠️ You need to select a file in the box on the left first!",
+        "download_header": "### 📥 Your finished Word file from TextFabriken is ready!",
+        "download_info": "💡 Before publishing: double-check all figures (dimensions, capacity, battery life, dB levels, etc.) against the manufacturer's original data. TextFabriken writes compelling copy, but is not responsible for the accuracy of the specifications.",
+        "download_button": "📝 Download product texts (.docx)",
+        "warning_text": "⚠️ **Always verify figures and specifications** (e.g. battery life, dimensions, performance) against your own product data before publishing the texts.",
+        "processing_batch": "*Processing part {i} of {n} in TextFabriken's machines...*",
+        "processing_single": "*TextFabriken is processing your words in the cloud...*",
+        "processing_mass": "*TextFabriken's machines are starting up in the cloud...*",
+        "user_label": "You",
+        "assistant_label": "TextFabriken",
+        "doc_heading": "SEO Product Descriptions - TextFabriken AI",
+        "mass_prompt_text": "Mass-generate SEO product descriptions for all products in the list.",
+        "system_prompt_free_chat": (
+            "You are TextFabriken, an AI assistant that helps online retailers write SEO product descriptions. Always respond in English. "
+            "You are ONE specific app, not a general e-commerce platform. You can ONLY: "
+            "1) transform an uploaded product list (PDF/TXT/Word) into compelling SEO copy, and "
+            "2) answer general questions about copywriting, SEO, or product texts. "
+            "You CANNOT handle orders, customer accounts, payments, shipping, returns, or stock status – that is not what this app does, and you must never pretend that you can. "
+            "If the user wants to download something you wrote, tell them to use the blue download button that automatically appears below the chat after every response. "
+            "If a question is outside what you can actually do, say so honestly instead of guessing or making up a solution. Respond naturally and helpfully within these boundaries."
+        ),
+    },
 }
 
 SEO_DIREKTIV = {
@@ -209,6 +242,20 @@ SEO_DIREKTIV = {
         "AVAINEDUT:\n- Kohta 1\n- Kohta 2\n- Kohta 3\n"
         "SEO-AVAINSANAT: Lisää 5 relevanttia hakusanaa Googlea varten.\n"
         "Älä käytä emojeita tai värillisiä merkkejä. Erota tuotteet toisistaan viivalla (---)."
+    ),
+    "Engelska": (
+        "You are TextFabriken, an absolute world champion in e-commerce, digital marketing, and SEO copywriting for the Nordic and international market. "
+        "ALWAYS write in English. "
+        "You have been given a file with raw data or a list of products. Your task is to transform this list into extremely compelling, bold, and modern product descriptions in English. "
+        "IMPORTANT: Never invent exact figures, dimensions, technical specifications, or performance values (e.g. battery life, dB levels, DPI, capacity in ml/liters) that are not present in the raw data you received. "
+        "If a specific figure is missing from the source material, write qualitatively instead (e.g. 'long battery life' or 'powerful noise cancellation') without guessing an exact number. "
+        "IMPORTANT: Never create more products than actually exist in the raw data. If a product name consists of several words, always treat the entire name as ONE single product – never split it into several separate products. "
+        "Each product must be structured according to the following strict format:\n"
+        "PRODUCT NAME (Use bold text)\n"
+        "SELLING DESCRIPTION: Write around 100 words that create an extremely strong 'must-have' feeling in the customer.\n"
+        "KEY BENEFITS:\n- Point 1\n- Point 2\n- Point 3\n"
+        "SEO TAGS: Add 5 relevant keywords for Google.\n"
+        "Do not use any emojis or colored bullet points whatsoever. Print the texts directly one after another, separated by a dash (---) between each product."
     ),
 }
 
