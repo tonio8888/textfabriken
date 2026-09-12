@@ -662,6 +662,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 st.markdown(f'<h3 style="text-align:center;margin-top:0;">{t["subheader"]}</h3>', unsafe_allow_html=True)
 st.write(t["intro"])
+st.markdown('<div style="padding-bottom:1rem;"></div>', unsafe_allow_html=True)
 
 with st.expander(t["howto_header"]):
     st.markdown(t["howto_steps"])
