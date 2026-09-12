@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
 import time
+import sqlite3
+import json
 from pypdf import PdfReader
 import io
 from docx import Document
@@ -10,8 +12,57 @@ st.set_page_config(page_title="TextFabriken AI", page_icon="🏭", layout="cente
 # --- SÄKRAD API-NYCKEL (Hämtas från ditt Streamlit-valv) ---
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 
+# --- DATABAS FÖR PERMANENT LAGRING AV SPARADE PRODUKTLISTOR ---
+DB_FIL = "textfabriken.db"
+
+def db_init():
+    conn = sqlite3.connect(DB_FIL)
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS sessioner (
+            namn TEXT PRIMARY KEY,
+            messages TEXT,
+            file_content TEXT,
+            show_download INTEGER
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+def db_spara_session(namn, messages, file_content, show_download):
+    conn = sqlite3.connect(DB_FIL)
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO sessioner (namn, messages, file_content, show_download)
+        VALUES (?, ?, ?, ?)
+        ON CONFLICT(namn) DO UPDATE SET
+            messages=excluded.messages,
+            file_content=excluded.file_content,
+            show_download=excluded.show_download
+    """, (namn, json.dumps(messages), file_content, int(show_download)))
+    conn.commit()
+    conn.close()
+
+def db_hamta_alla_sessioner():
+    conn = sqlite3.connect(DB_FIL)
+    cursor = conn.cursor()
+    cursor.execute("SELECT namn, messages, file_content, show_download FROM sessioner")
+    rader = cursor.fetchall()
+    conn.close()
+    sessioner = {}
+    for namn, messages_json, file_content, show_download in rader:
+        sessioner[namn] = {
+            "messages": json.loads(messages_json),
+            "file_content": file_content,
+            "show_download": bool(show_download)
+        }
+    return sessioner
+
+db_init()
+
 # --- INSTÄLLNINGAR & MINNE ---
-if "saved_sessions" not in st.session_state: st.session_state.saved_sessions = {}
+if "saved_sessions" not in st.session_state:
+    st.session_state.saved_sessions = db_hamta_alla_sessioner()  # Läs in tidigare sparade listor från databasen
 if "current_session_name" not in st.session_state: st.session_state.current_session_name = "Aktuell produktlista"
 if "messages" not in st.session_state: st.session_state.messages = []
 if "generated_file_content" not in st.session_state: st.session_state.generated_file_content = ""
@@ -186,6 +237,7 @@ if copy_klick:
             st.session_state.show_download = True
             st.session_state.fil_bearbetad = True  # Markera filen som klar - chatten blir nu fri
             st.session_state.saved_sessions[st.session_state.current_session_name] = {"messages": st.session_state.messages, "file_content": st.session_state.generated_file_content, "show_download": st.session_state.show_download}
+            db_spara_session(st.session_state.current_session_name, st.session_state.messages, st.session_state.generated_file_content, st.session_state.show_download)
             st.rerun()
 
 # LOGIK FÖR VANLIGA CHATTRUTAN
@@ -215,6 +267,7 @@ if prompt:
 
         if uploaded_file is not None:
             st.session_state.saved_sessions[st.session_state.current_session_name] = {"messages": st.session_state.messages, "file_content": st.session_state.generated_file_content, "show_download": st.session_state.show_download}
+            db_spara_session(st.session_state.current_session_name, st.session_state.messages, st.session_state.generated_file_content, st.session_state.show_download)
         st.rerun()
 
 # VISA WORD-KNAPP
