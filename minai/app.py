@@ -660,7 +660,7 @@ st.markdown(f"""
   <img src="data:image/png;base64,{_logo_b64}" width="64" height="64" style="border-radius:16px;" />
 </div>
 """, unsafe_allow_html=True)
-st.subheader(t["subheader"])
+st.markdown(f'<h3 style="text-align:center;">{t["subheader"]}</h3>', unsafe_allow_html=True)
 st.write(t["intro"])
 
 with st.expander(t["howto_header"]):
