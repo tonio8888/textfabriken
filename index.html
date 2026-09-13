@@ -241,6 +241,42 @@
     color: var(--text-muted);
   }
 
+  /* --- SHARE --- */
+  .share-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .share-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-right: 4px;
+  }
+  .share-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text);
+    transition: background 0.15s ease, transform 0.1s ease;
+    cursor: pointer;
+  }
+  .share-btn:hover { background: var(--surface-2); }
+  .share-btn:active { transform: scale(0.94); }
+  .share-btn.copied { color: var(--blue-light); }
+
+  .share-section {
+    padding: 36px 0;
+    border-top: none;
+  }
+
   footer.bottom {
     padding: 32px 0;
     border-top: 1px solid var(--border);
@@ -380,12 +416,42 @@
   </div>
 </section>
 
+<section class="share-section">
+  <div class="wrap">
+    <div class="share-row">
+      <span class="share-label">Dela TextFabriken:</span>
+      <a class="share-btn" title="Dela på X" target="_blank" rel="noopener"
+         href="https://twitter.com/intent/tweet?url=https%3A%2F%2Ftonio8888.github.io%2Ftextfabriken%2F&text=Kolla%20in%20TextFabriken%20AI">X</a>
+      <a class="share-btn" title="Dela på Facebook" target="_blank" rel="noopener"
+         href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Ftonio8888.github.io%2Ftextfabriken%2F">f</a>
+      <a class="share-btn" title="Dela på LinkedIn" target="_blank" rel="noopener"
+         href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Ftonio8888.github.io%2Ftextfabriken%2F">in</a>
+      <button class="share-btn" id="copyLinkBtn" title="Kopiera länk" type="button">⎘</button>
+    </div>
+  </div>
+</section>
+
 <footer class="bottom">
   <div class="wrap">
     <span>© 2026 TextFabriken AI</span>
     <span>Genererad text bör alltid kontrolleras innan publicering.</span>
   </div>
 </footer>
+
+<script>
+  document.getElementById('copyLinkBtn').addEventListener('click', function () {
+    navigator.clipboard.writeText('https://tonio8888.github.io/textfabriken/').then(function () {
+      var btn = document.getElementById('copyLinkBtn');
+      var original = btn.textContent;
+      btn.textContent = '✓';
+      btn.classList.add('copied');
+      setTimeout(function () {
+        btn.textContent = original;
+        btn.classList.remove('copied');
+      }, 1800);
+    });
+  });
+</script>
 
 </body>
 </html>
